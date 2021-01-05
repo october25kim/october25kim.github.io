@@ -18,7 +18,11 @@ layout: page
 ### Ensemble Learning
 - [A Decision-Theoretic Generalization of On-Line Learning and an Application to Boosting][adaboost]
 
+### Semi-Supervised Learning
+- [Unsupervised and Semi-Supervised Learning with Categorical Generative Adversarial Networks][catgan]
+
 [openmax]: {{ site.baseurl }}{% link _posts/2020-10-11-openmax-paper.md %}
 [gpr]: {{ site.baseurl }}{% link _posts/2020-10-31-gpr-paper.md %}
 [anogan]: {{ site.baseurl }}{% link _posts/2020-11-15-anogan-paper.md %}
 [adaboost]: {{ site.baseurl }}{% link _posts/2020-12-06-adaboost-paper.md %}
+[catgan]: {{ site.baseurl }}{% link _posts/2020-12-27-catgan-paper.md %}
