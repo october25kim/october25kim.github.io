@@ -1,0 +1,1262 @@
+
+<!doctype html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/assets/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/assets/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/assets/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="anogan," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Sanghoon's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="논문 선정 강필성 교수님의 비즈니스 어낼리틱스 수업의 세번째 논문 구현 주제는 Anomaly Detection이다. Anomaly Detection 방법론 중 GAN을 활용하여 Anomaly Detection을 수행하는 AnoGAN을 2년 전에 공부를 하며 코딩을 해두었는데 이번 기회에 다시 한 번 코드를 정리할 겸 추가적인 공부를 하기 위해 아래의 논문을 선정하였다.">
+<meta name="keywords" content="anogan">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unsupervised Anomaly Detection with Generative Adversarial Networks to Guide Marker Discovery">
+<meta property="og:url" content="http://localhost:4000/paper/anomaly%20detection/2020/11/15/anogan-paper/">
+<meta property="og:site_name" content="Sanghoon's Blog">
+<meta property="og:description" content="논문 선정 강필성 교수님의 비즈니스 어낼리틱스 수업의 세번째 논문 구현 주제는 Anomaly Detection이다. Anomaly Detection 방법론 중 GAN을 활용하여 Anomaly Detection을 수행하는 AnoGAN을 2년 전에 공부를 하며 코딩을 해두었는데 이번 기회에 다시 한 번 코드를 정리할 겸 추가적인 공부를 하기 위해 아래의 논문을 선정하였다.">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="/assets/figures/anogan/anogan.png">
+<meta property="og:image" content="/assets/figures/anogan/anogan0.png">
+<meta property="og:image" content="/assets/figures/anogan/anogan1.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Unsupervised Anomaly Detection with Generative Adversarial Networks to Guide Marker Discovery">
+<meta name="twitter:description" content="논문 선정 강필성 교수님의 비즈니스 어낼리틱스 수업의 세번째 논문 구현 주제는 Anomaly Detection이다. Anomaly Detection 방법론 중 GAN을 활용하여 Anomaly Detection을 수행하는 AnoGAN을 2년 전에 공부를 하며 코딩을 해두었는데 이번 기회에 다시 한 번 코드를 정리할 겸 추가적인 공부를 하기 위해 아래의 논문을 선정하였다.">
+<meta name="twitter:image" content="/assets/figures/anogan/anogan.png">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://localhost:4000/"/>
+
+
+
+
+
+  <title>Unsupervised Anomaly Detection with Generative Adversarial Networks to Guide Marker Discovery | Sanghoon's Blog</title>
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'G-XWS5Q99M4Y', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Sanghoon's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/navigator/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            Sitemap
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+<div id="posts" class="posts-expand">
+  
+  
+
+  
+
+  
+  
+  
+
+  <article class="post post-type- " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://localhost:4000/paper/anomaly%20detection/2020/11/15/anogan-paper/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Sanghoon Kim">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="assets/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sanghoon's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+          
+          
+            Unsupervised Anomaly Detection with Generative Adversarial Networks to Guide Marker Discovery
+          
+        </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-11-15T12:30:00+09:00">
+                2020-11-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/category/#/paper" itemprop="url" rel="index">
+                    <span itemprop="name">paper</span>
+                  </a>
+                </span>
+
+                
+                
+                  , 
+                
+              
+                
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/category/#/anomaly%20detection" itemprop="url" rel="index">
+                    <span itemprop="name">anomaly detection</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+            
+                <div class="post-description">
+                    
+                </div>
+            
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="논문-선정">논문 선정</h2>
+<p>강필성 교수님의 비즈니스 어낼리틱스 수업의 세번째 논문 구현 주제는 <strong>Anomaly Detection</strong>이다. Anomaly Detection 방법론 중 GAN을 활용하여 
+Anomaly Detection을 수행하는 AnoGAN을 2년 전에 공부를 하며 코딩을 해두었는데 이번 기회에 다시 한 번 코드를 정리할 겸 추가적인 공부를 하기 위해 아래의 논문을 선정하였다.<br /></p>
+
+<div align="center">
+<img src="/assets/figures/anogan/anogan.png" title="Unsupervised Anomaly Detection with Generative Adversarial Networks to Guide Marker Discovery" width="600" />
+</div>
+
+<blockquote>
+  <p>Schlegl, T., Seeböck, P., Waldstein, S. M., Schmidt-Erfurth, U., &amp; Langs, G. (2017, June). Unsupervised anomaly detection with generative adversarial networks to guide marker discovery. In International conference on information processing in medical imaging (pp. 146-157). Springer, Cham.</p>
+</blockquote>
+
+<h2 id="anogan-기본-구조-학습">AnoGAN 기본 구조 (학습)</h2>
+<p>Unsupervised Anomaly Detection with Generative Adversarial Networks to Guide Marker Discovery 논문에서 소개 된 AnoGAN은 
+Deep Convolutional Generative Adversarial Network (DCGAN)의 구조를 활용하여 정상 데이터의 latent space로 적절하게 매핑이 되는지 여부를 통해
+Anomaly Detection을 수행하는 방법론이다. 아래는 일반적인 DCGAN의 구조와 t-SNE embedding으로 정상(파란색), 비정상(빨간색)를 나타낸다.</p>
+
+<div align="center">
+<img src="/assets/figures/anogan/anogan0.png" width="800" />
+</div>
+
+<ul>
+  <li>Generator \(G\) : \(G(z) = z \rightarrow x\) 매핑을 통하여 \(x\)로부터 distribution \(p_g\)를 학습, 이 경우 Convolutional decoder</li>
+  <li>samples \(z\) : Latent space \(Z\)로부터 샘플링 된 1차원의 vector (일반적으로 uniform distribution을 따르는 noise)</li>
+  <li>Image patch \(x\) : image space manifold \(X\)안의 우리가 가지고 있는 정상 이미지 데이터</li>
+  <li>Discriminator \(D\) : 일반적인 CNN 구조로 2D images를 받아서 scalar value \(D(\cdot)\)으로 매핑, 원본 이미지와 Generator로부터 생긴 이미지를 구분</li>
+</ul>
+
+\[\min_G \max_D V(D, G) = \mathbb{E}_{\mathbf{x} \sim P_{data}(\mathbf{x})} \big[ \log D(\mathbf{x}) \big] 
++ \mathbb{E}_{\mathbf{z} \sim P_{\mathbf{z}}(\mathbf{z})} \big[ \log \big( 1- D(G(\mathbf{z})) \big) \big]\]
+
+<p>DCGAN은 GAN이 잘 학습되었다고 했을 때, \(z\)는 데이터들을 잘 압축하고 있다고 할 수 있다. 즉, \(z\)의 값들을 연속적으로 변화시키면 이에 맞춰 생성되는 이미지 또한 연속적으로 변화한다. 
+따라서 먼저 정상 데이터들을 사용해서 일반적인 DCGAN을 학습시키고 만약 GAN이 수렴했다면, 정상 데이터의 latent space, (위의 파란색) manifold \(X\)를 학습했다고 할 수 있다.</p>
+
+<h4 id="dcgan-기본구조-code">DCGAN 기본구조 Code</h4>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+
+<span class="k">def</span> <span class="nf">generator</span><span class="p">(</span><span class="n">z_in</span><span class="p">,</span> <span class="n">use_batchnorm</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_bias</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="n">reuse</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">AUTO_REUSE</span>
+    <span class="n">xavier_init</span><span class="p">,</span> <span class="n">xavier_init_conv</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">contrib</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">xavier_initializer</span><span class="p">(</span><span class="n">uniform</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span> <span class="n">tf</span><span class="p">.</span><span class="n">contrib</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">xavier_initializer_conv2d</span><span class="p">(</span><span class="n">uniform</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s">'generator'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">):</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">dense</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">z_in</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="mi">7</span><span class="o">*</span><span class="mi">7</span><span class="o">*</span><span class="mi">32</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">xavier_init</span><span class="p">,</span> <span class="n">use_bias</span><span class="o">=</span><span class="n">use_bias</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer1/dense'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer1/reshape'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_batchnorm</span><span class="p">:</span>
+            <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">batch_normalization</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="n">is_train</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer1/batchnorm'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">leaky_relu</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer1/act'</span><span class="p">)</span>
+        
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">conv2d_transpose</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">strides</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">use_bias</span><span class="o">=</span><span class="n">use_bias</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s">'same'</span><span class="p">,</span>
+                                         <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">xavier_init_conv</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer2/convtr'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_batchnorm</span><span class="p">:</span>
+            <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">batch_normalization</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="n">is_train</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer2/batchnorm'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">leaky_relu</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer2/act'</span><span class="p">)</span>
+        
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">conv2d_transpose</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">strides</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">use_bias</span><span class="o">=</span><span class="n">use_bias</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s">'same'</span><span class="p">,</span>
+                                         <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">xavier_init_conv</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer3/convtr'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_batchnorm</span><span class="p">:</span>
+            <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">batch_normalization</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="n">is_train</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer3/batchnorm'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">leaky_relu</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer3/act'</span><span class="p">)</span>
+        
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">conv2d_transpose</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">strides</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">use_bias</span><span class="o">=</span><span class="n">use_bias</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s">'same'</span><span class="p">,</span>
+                                         <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">xavier_init_conv</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer4/output'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
+        
+<span class="k">def</span> <span class="nf">discriminator</span><span class="p">(</span><span class="n">x_in</span><span class="p">,</span> <span class="n">use_batchnorm</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">use_bias</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="n">reuse</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">AUTO_REUSE</span>
+    <span class="n">xavier_init_conv</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">contrib</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">xavier_initializer_conv2d</span><span class="p">(</span><span class="n">uniform</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s">'discriminator'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">):</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">conv2d</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">x_in</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">strides</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">use_bias</span><span class="o">=</span><span class="n">use_bias</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s">'same'</span><span class="p">,</span>
+                               <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">xavier_init_conv</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer1/conv'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_batchnorm</span><span class="p">:</span>
+            <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">batch_normalization</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="n">is_train</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer1/batchnorm'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">leaky_relu</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer1/act'</span><span class="p">)</span>
+        
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">conv2d</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">strides</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">use_bias</span><span class="o">=</span><span class="n">use_bias</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s">'same'</span><span class="p">,</span>
+                               <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">xavier_init_conv</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer2/conv'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_batchnorm</span><span class="p">:</span>
+            <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">batch_normalization</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="n">is_train</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer2/batchnorm'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">leaky_relu</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer2/act'</span><span class="p">)</span>
+        
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer3/act'</span><span class="p">)</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">dense</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer3/output'</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">net</span>
+
+<span class="k">def</span> <span class="nf">chunks</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">),</span> <span class="n">n</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">n</span><span class="p">]</span>
+
+<span class="n">z_dim</span>          <span class="o">=</span> <span class="mi">50</span>
+<span class="n">is_train</span>       <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="nb">bool</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'is_train'</span><span class="p">)</span>
+<span class="n">z</span>              <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="n">z_dim</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s">'z'</span><span class="p">)</span>
+<span class="n">x</span>              <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">G</span>              <span class="o">=</span> <span class="n">generator</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<span class="n">D_real</span><span class="p">,</span> <span class="n">D_fake</span> <span class="o">=</span> <span class="n">discriminator</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">discriminator</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+<span class="n">d_loss_real</span>    <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">sigmoid_cross_entropy_with_logits</span><span class="p">(</span><span class="n">logits</span><span class="o">=</span><span class="n">D_real</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">D_real</span><span class="p">))</span>
+<span class="n">d_loss_fake</span>    <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">sigmoid_cross_entropy_with_logits</span><span class="p">(</span><span class="n">logits</span><span class="o">=</span><span class="n">D_fake</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">D_fake</span><span class="p">))</span>
+<span class="n">g_loss</span>         <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">sigmoid_cross_entropy_with_logits</span><span class="p">(</span><span class="n">logits</span><span class="o">=</span><span class="n">D_fake</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">D_fake</span><span class="p">)))</span>
+<span class="n">d_loss</span>         <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">d_loss_real</span><span class="p">)</span> <span class="o">+</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">d_loss_fake</span><span class="p">)</span>
+<span class="n">d_acc</span>          <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">concat</span><span class="p">([</span><span class="n">tf</span><span class="p">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">D_real</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">),</span> <span class="n">tf</span><span class="p">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">D_fake</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">)],</span> <span class="mi">0</span><span class="p">),</span>
+                                                 <span class="n">tf</span><span class="p">.</span><span class="n">concat</span><span class="p">([</span><span class="n">tf</span><span class="p">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">greater</span><span class="p">(</span><span class="n">D_real</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">),</span> <span class="n">tf</span><span class="p">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">greater</span><span class="p">(</span><span class="n">D_fake</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">)],</span> <span class="mi">0</span><span class="p">)),</span> <span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">))</span>
+<span class="n">g_vars</span>         <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">GraphKeys</span><span class="p">.</span><span class="n">GLOBAL_VARIABLES</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="s">'generator'</span><span class="p">)</span>
+<span class="n">d_vars</span>         <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">GraphKeys</span><span class="p">.</span><span class="n">GLOBAL_VARIABLES</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="s">'discriminator'</span><span class="p">)</span>
+<span class="n">update_ops</span>     <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">GraphKeys</span><span class="p">.</span><span class="n">UPDATE_OPS</span><span class="p">)</span>
+<span class="n">d_update_ops</span>   <span class="o">=</span> <span class="p">[</span><span class="n">var</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">update_ops</span> <span class="k">if</span> <span class="s">'discriminator'</span> <span class="ow">in</span> <span class="n">var</span><span class="p">.</span><span class="n">name</span><span class="p">]</span>
+<span class="n">g_update_ops</span>   <span class="o">=</span> <span class="p">[</span><span class="n">var</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">update_ops</span> <span class="k">if</span> <span class="s">'generator'</span> <span class="ow">in</span> <span class="n">var</span><span class="p">.</span><span class="n">name</span><span class="p">]</span>
+
+<span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">control_dependencies</span><span class="p">(</span><span class="n">d_update_ops</span><span class="p">):</span>
+    <span class="n">d_opt1</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">train</span><span class="p">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">1E-3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'D-optimizer-1'</span><span class="p">).</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="n">d_loss</span><span class="p">,</span> <span class="n">var_list</span><span class="o">=</span><span class="n">d_vars</span><span class="p">)</span>
+    <span class="n">d_opt2</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">train</span><span class="p">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">1E-4</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'D-optimizer-2'</span><span class="p">).</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="n">d_loss</span><span class="p">,</span> <span class="n">var_list</span><span class="o">=</span><span class="n">d_vars</span><span class="p">)</span>
+    
+<span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">control_dependencies</span><span class="p">(</span><span class="n">g_update_ops</span><span class="p">):</span>
+    <span class="n">g_opt1</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">train</span><span class="p">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">1E-3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'G-optimizer-1'</span><span class="p">).</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="n">g_loss</span><span class="p">,</span> <span class="n">var_list</span><span class="o">=</span><span class="n">g_vars</span><span class="p">)</span>
+    <span class="n">g_opt2</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">train</span><span class="p">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">1E-4</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'G-optimizer-2'</span><span class="p">).</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="n">g_loss</span><span class="p">,</span> <span class="n">var_list</span><span class="o">=</span><span class="n">g_vars</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="anogan-기본-구조-테스트">AnoGAN 기본 구조 (테스트)</h2>
+<div align="center">
+<img src="/assets/figures/anogan/anogan1.png" width="800" />
+</div>
+<p><br /></p>
+
+<p>DCGAN의 학습이 완료되었다면 테스트를 통해 궁금한 데이터의 정상 여부를 판단해야 한다. 하지만 \(\mathbf{z} \rightarrow \mathbf{x}\)로 매핑하는 것은 
+Generator \(G(\mathbf{z}) = \mathbf{z} \rightarrow \mathbf{x}\)를 통하여 가능하지만 그 반대의 상황인 원본 이미지를 통해 \(\mathbf{x} \rightarrow \mathbf{z}\)로 
+매핑하는 것은 어렵다.
+즉, 원본 이미지를 통해 latent space \(\mathbf{z}\)로 매핑하는 작업(\(G^{-1}(\mathbf{x}) = \mathbf{x} \rightarrow \mathbf{z}\))을 \(G\)와 \(D\)만으로는 할 수가 없다.</p>
+
+<p>그래서 AnoGAN은 query image \(\mathbf{x}\)가 주어졌을때, 해당 이미지 \(\mathbf{x}\)와 가장 유사한 이미지 \(G(\mathbf{z})\)를 생성하는 \(\mathbf{z}\)를 찾아낸다. 
+가장 최적화된 \(\mathbf{z}\)를 찾기 위해서 먼저 학습과정에서 사용한 분포 \(\mathbf{p_z}\)에서 임의의 노이즈 \(\mathbf{z_1}\)을 추출하고 \(G(\mathbf{z_1})\)을 통해 가짜 이미지를 생성한다. 
+이렇게 만들어 낸 이미지에서 Residual Loss 그리고 Discrimination Loss로 이루어 진 loss function을 통해 gradients를 계산하고 
+backpropagation을 통해서 \(\mathbf{z_1}\)의 coefficients를 업데이트한다. 이렇게 만들어진 값이 다시 \(\mathbf{z_2}\)가 되고 이 과정을 반복하여
+얻어진 \(G(\mathbf{z}_\gamma)\)이 \(\mathbf{x}\)와 얼마나 유사했는지를 판단하여 정상 여부를 결정한다. 이때 이 과정은 \(G\)와 \(D\)의 parameter들은 고정한 상태에서 진행된다. 결과적으로 query image \(\mathbf{x}\)가 정상 데이터라면 
+latent space로의 매핑이 가능해 loss가 적게 발생하겠지만 비정상 데이터라면 큰 차이의 loss가 생기게 된다.</p>
+
+<p>좀 더 구체적으로 Residual Loss 그리고 Discrimination Loss로 이루어 진 loss function을 설명해보자.</p>
+
+<h3 id="residual-loss">Residual Loss</h3>
+<p>Residual Loss는 Generator로 부터 만들어 낸 image(\(G(\mathbf{z}_\gamma)\))와 query image \(\mathbf{x}\) 간의 시각적 차이를 나타낸다. 이는 아래의 식으로 표현할 수 있다.</p>
+
+\[L_R \left(\mathbf{z}_{\gamma} \right) = \sum \big|\ \mathbf{x} - G(\mathbf{z}_\gamma) \ \big|\]
+
+<p>만약 완벽한 \(G\)를 통해 latent space로 완전한 대응이 가능하다면 정상 이미지 \(\mathbf{x}\)가 입력되었을 때, \(\mathbf{x}\)와 \(G(\mathbf{z}_\gamma)\)는 
+동일하게 되어 Residual loss는 0이 된다. 코드로는 Residual Loss를 다음과 같이 표현할 수 있다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">residual_loss</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="nb">abs</span><span class="p">(</span><span class="n">target_x</span> <span class="o">-</span> <span class="n">mapped_x</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+</code></pre></div></div>
+
+<h3 id="discrimination-loss">Discrimination Loss</h3>
+<p>Discriminator \(D\)의 역할은 Generator로부터 생성된 가짜 이미지인지 진짜 원본 이미지인지를 판단하는 것이다. 즉, \(D\)는 학습 데이터의 분포를 파악하는 역할을 한다고 생각할 수 있다. 
+AnoGAN의 Discrimination loss는 Generator로 부터 만들어 낸 image(\(G(\mathbf{z}_\gamma)\))가 manifold 혹은 데이터의 분포에 잘 위치하도록 페널티를 부과하는 역할을 한다. 
+즉 Discrimination loss값을 구해서 \(\mathbf{z}_\gamma\)를 업데이트하는데 사용된다.</p>
+
+\[L_D(\mathbf{z}_\gamma) = \sum \big\| \mathbf{f}(\mathbf{x}) - \mathbf{f}(G(\mathbf{z}_\gamma)) \big\|\]
+
+<p>\(\mathbf{f}\)는 feature mapping에서 나온 개념으로 discriminator의 중간층에 있는 activations들을 가르킨다. 
+즉 AnoGAN은 Discriminator \(D\)의 최종 출력(0 또는 1)을 사용하지 않고 중간 레이어에서의 결과값을 통해 Discrimination loss를 구성한다. 
+논문에서는 이 discriminator의 중간층에 있는 activations들이 더 풍부한 표현력을 가지고 있기 때문이라고 설명한다. 코드로는 Discrimination Loss를 다음과 같이 표현할 수 있다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">discrimination_loss</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="nb">abs</span><span class="p">(</span><span class="n">target_d_feature</span> <span class="o">-</span> <span class="n">mapped_d_feature</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>최종 loss는 이 둘의 weighted sum이다.</p>
+
+\[L(\mathbf{z}_\gamma) = (1-\lambda) \cdot L_R(\mathbf{z}_\gamma) + \lambda \cdot L_D (\mathbf{z}_\gamma)\]
+
+<p>로 표현한다. 위의 loss를 바탕으로 backpropagation 방식으로 \(\mathbf{z}_\gamma\)를 업데이트시킨다. 
+즉 \(G\)와 \(D\) parameter들은 고정된 상태로 \(\mathbf{z}\)의 coefficients를 업데이트한다.
+일정 횟수 동안 업데이트가 진행되면 마지막으로 loss를 구한다음, 이 loss가 특정값 미만이면 정상, 
+특정값 이상이면 비정상으로 판단하게 된다. 즉, 낮은 loss는 입력과 유사한 데이터를 학습 과정에서 봤고, manifold에 적절한 매핑이 가능하다는 의미지만, 
+높은 loss는 적절한 매핑을 찾는데 실패했다는 의미로 해석할 수 있다. 논문에서는 총 500번 \(\mathbf{z}\)의 coefficients를 업데이트하는 과정을 수행하였고 
+두 loss의 weight parameter로 작용하는 \(\lambda\)는 0.1로 설정했다. 코드로 전체 Loss를 표현하면 다음과 같다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mapping_loss</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">lam</span><span class="p">)</span><span class="o">*</span><span class="n">residual_loss</span> <span class="o">+</span> <span class="n">lam</span><span class="o">*</span><span class="n">discrimination_loss</span>
+</code></pre></div></div>
+<h2 id="anomaly-detection-with-anogan-python-36-tensorflow-115">Anomaly Detection with AnoGAN (python 3.6, tensorflow 1.15)</h2>
+<p>앞서 소개한대로 DCGAN의 일반적인 구조에 AnoGAN의 최종 loss를 추가하여 Anomaly Detection을 수행하는 코드는 다음과 같다. 먼저 정상 데이터들로 DCGAN을 학습시키고,</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="kn">from</span> <span class="nn">tensorflow.examples.tutorials.mnist</span> <span class="kn">import</span> <span class="n">input_data</span>
+<span class="n">mnist</span> <span class="o">=</span> <span class="n">input_data</span><span class="p">.</span><span class="n">read_data_sets</span><span class="p">(</span><span class="s">'MNIST_data/'</span><span class="p">,</span> <span class="n">one_hot</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">reshape</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">generator</span><span class="p">(</span><span class="n">z_in</span><span class="p">,</span> <span class="n">use_batchnorm</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_bias</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="n">reuse</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">AUTO_REUSE</span>
+    <span class="n">xavier_init</span><span class="p">,</span> <span class="n">xavier_init_conv</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">contrib</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">xavier_initializer</span><span class="p">(</span><span class="n">uniform</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span> <span class="n">tf</span><span class="p">.</span><span class="n">contrib</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">xavier_initializer_conv2d</span><span class="p">(</span><span class="n">uniform</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s">'generator'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">):</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">dense</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">z_in</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="mi">7</span><span class="o">*</span><span class="mi">7</span><span class="o">*</span><span class="mi">32</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">xavier_init</span><span class="p">,</span> <span class="n">use_bias</span><span class="o">=</span><span class="n">use_bias</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer1/dense'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer1/reshape'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_batchnorm</span><span class="p">:</span>
+            <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">batch_normalization</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="n">is_train</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer1/batchnorm'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">leaky_relu</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer1/act'</span><span class="p">)</span>
+        
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">conv2d_transpose</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">strides</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">use_bias</span><span class="o">=</span><span class="n">use_bias</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s">'same'</span><span class="p">,</span>
+                                         <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">xavier_init_conv</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer2/convtr'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_batchnorm</span><span class="p">:</span>
+            <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">batch_normalization</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="n">is_train</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer2/batchnorm'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">leaky_relu</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer2/act'</span><span class="p">)</span>
+        
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">conv2d_transpose</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">strides</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">use_bias</span><span class="o">=</span><span class="n">use_bias</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s">'same'</span><span class="p">,</span>
+                                         <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">xavier_init_conv</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer3/convtr'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_batchnorm</span><span class="p">:</span>
+            <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">batch_normalization</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="n">is_train</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer3/batchnorm'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">leaky_relu</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer3/act'</span><span class="p">)</span>
+        
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">conv2d_transpose</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">strides</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">use_bias</span><span class="o">=</span><span class="n">use_bias</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s">'same'</span><span class="p">,</span>
+                                         <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">xavier_init_conv</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer4/output'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
+        
+<span class="k">def</span> <span class="nf">discriminator</span><span class="p">(</span><span class="n">x_in</span><span class="p">,</span> <span class="n">use_batchnorm</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">use_bias</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="n">reuse</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">AUTO_REUSE</span>
+    <span class="n">xavier_init_conv</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">contrib</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">xavier_initializer_conv2d</span><span class="p">(</span><span class="n">uniform</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s">'discriminator'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">):</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">conv2d</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">x_in</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">strides</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">use_bias</span><span class="o">=</span><span class="n">use_bias</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s">'same'</span><span class="p">,</span>
+                               <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">xavier_init_conv</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer1/conv'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_batchnorm</span><span class="p">:</span>
+            <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">batch_normalization</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="n">is_train</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer1/batchnorm'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">leaky_relu</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer1/act'</span><span class="p">)</span>
+        
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">conv2d</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">strides</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">use_bias</span><span class="o">=</span><span class="n">use_bias</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s">'same'</span><span class="p">,</span>
+                               <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">xavier_init_conv</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer2/conv'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_batchnorm</span><span class="p">:</span>
+            <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">batch_normalization</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="n">is_train</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer2/batchnorm'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">leaky_relu</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer2/act'</span><span class="p">)</span>
+        
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer3/act'</span><span class="p">)</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">dense</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer3/output'</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">net</span>
+
+<span class="k">def</span> <span class="nf">chunks</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">),</span> <span class="n">n</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">n</span><span class="p">]</span>
+
+<span class="n">z_dim</span>          <span class="o">=</span> <span class="mi">50</span>
+<span class="n">is_train</span>       <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="nb">bool</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'is_train'</span><span class="p">)</span>
+<span class="n">z</span>              <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="n">z_dim</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s">'z'</span><span class="p">)</span>
+<span class="n">x</span>              <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">G</span>              <span class="o">=</span> <span class="n">generator</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<span class="n">D_real</span><span class="p">,</span> <span class="n">D_fake</span> <span class="o">=</span> <span class="n">discriminator</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">discriminator</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+<span class="n">d_loss_real</span>    <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">sigmoid_cross_entropy_with_logits</span><span class="p">(</span><span class="n">logits</span><span class="o">=</span><span class="n">D_real</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">D_real</span><span class="p">))</span>
+<span class="n">d_loss_fake</span>    <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">sigmoid_cross_entropy_with_logits</span><span class="p">(</span><span class="n">logits</span><span class="o">=</span><span class="n">D_fake</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">D_fake</span><span class="p">))</span>
+<span class="n">g_loss</span>         <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">sigmoid_cross_entropy_with_logits</span><span class="p">(</span><span class="n">logits</span><span class="o">=</span><span class="n">D_fake</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">D_fake</span><span class="p">)))</span>
+<span class="n">d_loss</span>         <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">d_loss_real</span><span class="p">)</span> <span class="o">+</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">d_loss_fake</span><span class="p">)</span>
+<span class="n">d_acc</span>          <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">concat</span><span class="p">([</span><span class="n">tf</span><span class="p">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">D_real</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">),</span> <span class="n">tf</span><span class="p">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">D_fake</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">)],</span> <span class="mi">0</span><span class="p">),</span>
+                                                 <span class="n">tf</span><span class="p">.</span><span class="n">concat</span><span class="p">([</span><span class="n">tf</span><span class="p">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">greater</span><span class="p">(</span><span class="n">D_real</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">),</span> <span class="n">tf</span><span class="p">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">greater</span><span class="p">(</span><span class="n">D_fake</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">)],</span> <span class="mi">0</span><span class="p">)),</span> <span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">))</span>
+<span class="n">g_vars</span>         <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">GraphKeys</span><span class="p">.</span><span class="n">GLOBAL_VARIABLES</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="s">'generator'</span><span class="p">)</span>
+<span class="n">d_vars</span>         <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">GraphKeys</span><span class="p">.</span><span class="n">GLOBAL_VARIABLES</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="s">'discriminator'</span><span class="p">)</span>
+<span class="n">update_ops</span>     <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">GraphKeys</span><span class="p">.</span><span class="n">UPDATE_OPS</span><span class="p">)</span>
+<span class="n">d_update_ops</span>   <span class="o">=</span> <span class="p">[</span><span class="n">var</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">update_ops</span> <span class="k">if</span> <span class="s">'discriminator'</span> <span class="ow">in</span> <span class="n">var</span><span class="p">.</span><span class="n">name</span><span class="p">]</span>
+<span class="n">g_update_ops</span>   <span class="o">=</span> <span class="p">[</span><span class="n">var</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">update_ops</span> <span class="k">if</span> <span class="s">'generator'</span> <span class="ow">in</span> <span class="n">var</span><span class="p">.</span><span class="n">name</span><span class="p">]</span>
+
+<span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">control_dependencies</span><span class="p">(</span><span class="n">d_update_ops</span><span class="p">):</span>
+    <span class="n">d_opt1</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">train</span><span class="p">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">1E-3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'D-optimizer-1'</span><span class="p">).</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="n">d_loss</span><span class="p">,</span> <span class="n">var_list</span><span class="o">=</span><span class="n">d_vars</span><span class="p">)</span>
+    <span class="n">d_opt2</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">train</span><span class="p">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">1E-4</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'D-optimizer-2'</span><span class="p">).</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="n">d_loss</span><span class="p">,</span> <span class="n">var_list</span><span class="o">=</span><span class="n">d_vars</span><span class="p">)</span>
+    
+<span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">control_dependencies</span><span class="p">(</span><span class="n">g_update_ops</span><span class="p">):</span>
+    <span class="n">g_opt1</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">train</span><span class="p">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">1E-3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'G-optimizer-1'</span><span class="p">).</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="n">g_loss</span><span class="p">,</span> <span class="n">var_list</span><span class="o">=</span><span class="n">g_vars</span><span class="p">)</span>
+    <span class="n">g_opt2</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">train</span><span class="p">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">1E-4</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'G-optimizer-2'</span><span class="p">).</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="n">g_loss</span><span class="p">,</span> <span class="n">var_list</span><span class="o">=</span><span class="n">g_vars</span><span class="p">)</span>
+    
+<span class="n">config</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">ConfigProto</span><span class="p">()</span>
+<span class="n">config</span><span class="p">.</span><span class="n">gpu_options</span><span class="p">.</span><span class="n">allow_growth</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">Session</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+<span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+
+<span class="n">train_dat</span> <span class="o">=</span> <span class="n">mnist</span><span class="p">.</span><span class="n">train</span><span class="p">.</span><span class="n">images</span><span class="o">*</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="n">n_train</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_dat</span><span class="p">)</span>
+
+<span class="n">max_epoch</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">minibatch_size</span> <span class="o">=</span> <span class="mi">256</span>
+
+<span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">max_epoch</span><span class="p">))</span>
+
+<span class="n">d_opt</span><span class="p">,</span> <span class="n">g_opt</span> <span class="o">=</span> <span class="n">d_opt1</span><span class="p">,</span> <span class="n">g_opt1</span>
+<span class="n">g_loss_traj</span><span class="p">,</span> <span class="n">d_loss_traj</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">pbar</span><span class="p">:</span>
+    <span class="n">train_idx</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_train</span><span class="p">)</span>
+    <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">train_idx</span><span class="p">)</span>
+    <span class="n">train_batch</span> <span class="o">=</span> <span class="n">chunks</span><span class="p">(</span><span class="n">train_idx</span><span class="p">,</span> <span class="n">minibatch_size</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">epoch</span> <span class="o">==</span> <span class="mi">150</span><span class="p">:</span>
+        <span class="n">d_opt</span><span class="p">,</span> <span class="n">g_opt</span> <span class="o">=</span> <span class="n">d_opt2</span><span class="p">,</span> <span class="n">g_opt2</span>
+        
+    <span class="n">g_loss_stack</span><span class="p">,</span> <span class="n">d_loss_stack</span><span class="p">,</span> <span class="n">d_acc_stack</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">batch_idx</span> <span class="ow">in</span> <span class="n">train_batch</span><span class="p">:</span>
+        <span class="n">batch_x</span> <span class="o">=</span> <span class="n">train_dat</span><span class="p">[</span><span class="n">batch_idx</span><span class="p">]</span>
+        <span class="n">batch_z</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">batch_idx</span><span class="p">),</span> <span class="n">z_dim</span><span class="p">])</span>
+        <span class="n">D_loss</span><span class="p">,</span> <span class="n">D_acc</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">([</span><span class="n">d_loss</span><span class="p">,</span> <span class="n">d_acc</span><span class="p">,</span> <span class="n">d_opt</span><span class="p">],</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">batch_x</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">batch_z</span><span class="p">,</span> <span class="n">is_train</span><span class="p">:</span> <span class="bp">True</span><span class="p">})</span>
+        <span class="n">_</span>         <span class="o">=</span> <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">g_opt</span><span class="p">,</span>           <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">z</span><span class="p">:</span> <span class="n">batch_z</span><span class="p">,</span> <span class="n">is_train</span><span class="p">:</span> <span class="bp">True</span><span class="p">})</span>
+        <span class="n">G_loss</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">([</span><span class="n">g_loss</span><span class="p">,</span> <span class="n">g_opt</span><span class="p">],</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">z</span><span class="p">:</span> <span class="n">batch_z</span><span class="p">,</span> <span class="n">is_train</span><span class="p">:</span> <span class="bp">True</span><span class="p">})</span>
+        
+        <span class="n">g_loss_stack</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">G_loss</span><span class="p">)</span>
+        <span class="n">d_loss_stack</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">D_loss</span><span class="p">)</span>
+        <span class="n">d_acc_stack</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">D_acc</span><span class="p">)</span>
+        
+    <span class="n">g_loss_traj</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">g_loss_stack</span><span class="p">))</span>
+    <span class="n">d_loss_traj</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">d_loss_stack</span><span class="p">))</span>
+    <span class="n">pbar</span><span class="p">.</span><span class="n">set_description</span><span class="p">(</span><span class="s">'G-loss: {:.4f} | D-loss: {:.4f} | D-accuracy: {:.4f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">g_loss_stack</span><span class="p">),</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">d_loss_stack</span><span class="p">),</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">d_acc_stack</span><span class="p">)))</span>
+    
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">g_loss_traj</span><span class="p">);</span> <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">d_loss_traj</span><span class="p">);</span> <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">batch_z</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">[</span><span class="mi">16</span><span class="p">,</span> <span class="n">z_dim</span><span class="p">])</span>
+<span class="n">samples</span> <span class="o">=</span> <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">z</span><span class="p">:</span> <span class="n">batch_z</span><span class="p">,</span> <span class="n">is_train</span><span class="p">:</span> <span class="bp">False</span><span class="p">})</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sample</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">samples</span><span class="p">):</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">sample</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'gray'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>DCGAN의 학습과정에서 얻어진 분포 \(\mathbf{p_z}\)에서 임의의 노이즈 \(\mathbf{z}\)을 추출하고 \(G\)와 \(D\)의 parameter들은 고정한 상태에서 
+\(\mathbf{z}\)의 coefficients를 업데이트하는 과정을 일정 횟수 반복한 뒤,
+최종적으로 얻어진 \(\mathbf{z}_\gamma\)로부터 생성 된 \(G(\mathbf{z}_\gamma)\)이 \(\mathbf{x}\)와 얼마나 유사했는지를 판단하여 정상 여부를 결정한다. 
+즉, 정상 데이터의 latent space로 적절하게 매핑이 되는지 여부를 통해 데이터의 정상여부를 판단한다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">### AnoGAN - mapping new observations to the latent space
+</span><span class="k">def</span> <span class="nf">get_discriminator_feature</span><span class="p">(</span><span class="n">x_in</span><span class="p">,</span> <span class="n">use_batchnorm</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">use_bias</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="n">reuse</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">xavier_init_conv</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">contrib</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">xavier_initializer_conv2d</span><span class="p">(</span><span class="n">uniform</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s">'discriminator'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">):</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">conv2d</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">x_in</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">strides</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">use_bias</span><span class="o">=</span><span class="n">use_bias</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s">'same'</span><span class="p">,</span>
+                               <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">xavier_init_conv</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer1/conv'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_batchnorm</span><span class="p">:</span>
+            <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">batch_normalization</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer1/batchnorm'</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="n">reuse</span><span class="p">)</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">leaky_relu</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'layer1/act'</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">net</span>
+
+<span class="n">target_x</span>            <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s">'target_x'</span><span class="p">)</span>
+<span class="n">target_z</span>            <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s">'anogan/target_z'</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">z_dim</span><span class="p">],</span> <span class="n">initializer</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">random_uniform_initializer</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">trainable</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">mapped_x</span>            <span class="o">=</span> <span class="n">generator</span><span class="p">(</span><span class="n">target_z</span><span class="p">)</span>
+<span class="n">target_d_feature</span>    <span class="o">=</span> <span class="n">get_discriminator_feature</span><span class="p">(</span><span class="n">target_x</span><span class="p">)</span>
+<span class="n">mapped_d_feature</span>    <span class="o">=</span> <span class="n">get_discriminator_feature</span><span class="p">(</span><span class="n">mapped_x</span><span class="p">)</span>
+<span class="n">lam</span>                 <span class="o">=</span> <span class="mf">0.7</span>
+<span class="n">anogan_var</span>          <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">get_collection</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">GraphKeys</span><span class="p">.</span><span class="n">GLOBAL_VARIABLES</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="s">'anogan'</span><span class="p">)</span>
+<span class="n">residual_loss</span>       <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="nb">abs</span><span class="p">(</span><span class="n">target_x</span> <span class="o">-</span> <span class="n">mapped_x</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="n">discrimination_loss</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="nb">abs</span><span class="p">(</span><span class="n">target_d_feature</span> <span class="o">-</span> <span class="n">mapped_d_feature</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="n">mapping_loss</span>        <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">lam</span><span class="p">)</span><span class="o">*</span><span class="n">residual_loss</span> <span class="o">+</span> <span class="n">lam</span><span class="o">*</span><span class="n">discrimination_loss</span>
+<span class="n">mapping_loss_opt1</span>   <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">train</span><span class="p">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">1E-1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'mapping-optimizer-1'</span><span class="p">).</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="n">mapping_loss</span><span class="p">,</span> <span class="n">var_list</span><span class="o">=</span><span class="n">anogan_var</span><span class="p">)</span>
+<span class="n">mapping_loss_opt2</span>   <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">train</span><span class="p">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">1E-2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'mapping-optimizer-2'</span><span class="p">).</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="n">mapping_loss</span><span class="p">,</span> <span class="n">var_list</span><span class="o">=</span><span class="n">anogan_var</span><span class="p">)</span>
+
+<span class="n">uninitialized_variables</span> <span class="o">=</span> <span class="p">[</span><span class="n">var</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">tf</span><span class="p">.</span><span class="n">global_variables</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">is_variable_initialized</span><span class="p">(</span><span class="n">var</span><span class="p">)))]</span>
+<span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">variables_initializer</span><span class="p">(</span><span class="n">uninitialized_variables</span><span class="p">))</span>
+
+<span class="n">query_x</span> <span class="o">=</span> <span class="n">mnist</span><span class="p">.</span><span class="n">test</span><span class="p">.</span><span class="n">images</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">variables_initializer</span><span class="p">(</span><span class="n">anogan_var</span><span class="p">))</span>
+<span class="n">mapping_loss_traj</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">mapping_loss_opt</span> <span class="o">=</span> <span class="n">mapping_loss_opt1</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">150</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">50</span><span class="p">:</span>
+        <span class="n">mapping_loss_opt</span> <span class="o">=</span> <span class="n">mapping_loss_opt2</span>
+    <span class="n">loss</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">([</span><span class="n">mapping_loss</span><span class="p">,</span> <span class="n">mapping_loss_opt</span><span class="p">],</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">target_x</span><span class="p">:</span> <span class="n">query_x</span><span class="p">,</span> <span class="n">is_train</span><span class="p">:</span> <span class="bp">False</span><span class="p">})</span>
+    <span class="n">mapping_loss_traj</span><span class="p">.</span><span class="n">extend</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+
+<span class="n">anomaly_score</span> <span class="o">=</span> <span class="n">mapping_loss</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1">### Comparison of Query Image and Mapped Image
+</span><span class="n">generated_x</span> <span class="o">=</span> <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">generator</span><span class="p">(</span><span class="n">target_z</span><span class="p">),</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">is_train</span><span class="p">:</span> <span class="bp">False</span><span class="p">})</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">generated_x</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'gray'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Mapped Image'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">query_x</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'gray'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Query Image'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mapping_loss_traj</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Mapping loss per iteration'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h2 id="결론">결론</h2>
+<p>이번 논문 구현 과제를 통해 오래 전에 작성한 코드와 논문을 다시 복습할 수 있는 기회를 가졌다. 당시 GAN과 Auto-Encoder 관련 논문을 읽고 코드로 구현을 해두었는데
+시간이 지나니 많은 부분 기억이 잘 나지 않아 다시 공부를 해야 했다. 추후 시간이 날 때마다 AnoGAN 뿐만 아니라 구현해두었던 InfoGAN, Wasserstein GAN, Bidectional GAN, VAE, AAE 등을 정리하여 
+포스팅해두어야 겠다.</p>
+
+<blockquote>
+  <p><strong>참고문헌</strong></p>
+  <ol>
+    <li>Schlegl, T., Seeböck, P., Waldstein, S. M., Schmidt-Erfurth, U., &amp; Langs, G. (2017, June). Unsupervised anomaly detection with generative adversarial networks to guide marker discovery. In International conference on information processing in medical imaging (pp. 146-157). Springer, Cham. <br /></li>
+    <li>Radford, A., Metz, L., &amp; Chintala, S. (2015). Unsupervised representation learning with deep convolutional generative adversarial networks. arXiv preprint arXiv:1511.06434.</li>
+  </ol>
+</blockquote>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            
+            <a href="/tag/#/anogan" rel="tag"># anogan</a>
+          
+        </div>
+      
+
+      
+      
+      
+      
+      
+
+      
+      
+        <div class="post-nav" id="post-nav-id">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/paper/ensemble%20learning/2020/12/06/adaboost-paper/" rel="next" title="A Decision-Theoretic Generalization of On-Line Learning and an Application to Boosting">
+                <i class="fa fa-chevron-left"></i> A Decision-Theoretic Generalization of On-Line Learning and an Application to Boosting
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/paper/kernel%20method/2020/10/31/gpr-paper/" rel="prev" title="Gaussian Process for Regression">
+                Gaussian Process for Regression <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+      
+
+      
+    </footer>
+  </article>
+
+  <div class="post-spread">
+    
+  </div>
+</div>
+
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = http://localhost:4000/paper/anomaly%20detection/2020/11/15/anogan-paper/;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = /paper/anomaly%20detection/2020/11/15/anogan-paper; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://october25kim.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        
+        
+        
+
+
+
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/assets/images/avatar.gif"
+               alt="Sanghoon Kim" />
+          <p class="site-author-name" itemprop="name">Sanghoon Kim</p>
+           
+              <p class="site-description motion-element" itemprop="description">Study Record of Machine Learning, Deep Learning</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+        
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+
+
+
+
+            
+              <div class="post-toc-content">
+    <ol class=nav>
+      <li class="nav-item nav-level-2"> <a class="nav-link" href="#논문-선정"> <span class="nav-number">1</span> <span class="nav-text">논문 선정</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#anogan-기본-구조-학습"> <span class="nav-number">2</span> <span class="nav-text">AnoGAN 기본 구조 (학습)</span> </a> <ol class="nav-child"> <ol class="nav-child"> <li class="nav-item nav-level-4"> <a class="nav-link" href="#dcgan-기본구조-code"> <span class="nav-number">2.0.1</span> <span class="nav-text">DCGAN 기본구조 Code</span> </a> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#anogan-기본-구조-테스트"> <span class="nav-number">3</span> <span class="nav-text">AnoGAN 기본 구조 (테스트)</span> </a> <ol class="nav-child"> <li class="nav-item nav-level-3"> <a class="nav-link" href="#residual-loss"> <span class="nav-number">3.1</span> <span class="nav-text">Residual Loss</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-3"> <a class="nav-link" href="#discrimination-loss"> <span class="nav-number">3.2</span> <span class="nav-text">Discrimination Loss</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#anomaly-detection-with-anogan-python-36-tensorflow-115"> <span class="nav-number">4</span> <span class="nav-text">Anomaly Detection with AnoGAN (python 3.6, tensorflow 1.15)</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> </li></ol> </li></ol> </li></ol> </li></ol> </li> <li class="nav-item nav-level-2"> <a class="nav-link" href="#결론"> <span class="nav-number">5</span> <span class="nav-text">결론</span> </a> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child"> <ol class="nav-child">
+    </ol>
+  </div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Sanghoon Kim</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://jekyllrb.com">Jekyll</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/simpleyyt/jekyll-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+   
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  
+  
+  
+  
+  <script type="text/javascript" src="/assets/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/assets/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/assets/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  <script type="text/javascript" src="/assets/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/assets/js/src/post-details.js?v=5.1.1"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/assets/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+
+    
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>
+

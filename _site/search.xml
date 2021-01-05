@@ -1,0 +1,1530 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  
+    <entry>
+      <title>A Decision-Theoretic Generalization of On-Line Learning and an Application to Boosting</title>
+      <url>/paper/ensemble%20learning/2020/12/06/adaboost-paper/</url>
+      <content type="text">논문 선정
+강필성 교수님의 비즈니스 어낼리틱스 수업의 네번째 논문 구현 주제는 Ensemble Learning이다. Boosting Algorihtm 기반의 방법론을 깊게 공부해보고자 
+가장 초기의 Boosting Algorihtm 중 하나인 Adaptive Boosting을 다룬 논문을 선정하였다. Adaptive Boosting의 줄임말인 AdaBoost는 1996년에 Freund와 Schapire이 제안한 알고리즘으로 
+2003년에는 괴델상을 수상한 알고리즘이기도 하다.
+
+
+
+
+
+
+
+  Freund, Y., &amp;amp; Schapire, R. E. (1997). A decision-theoretic generalization of on-line learning and an application to boosting. Journal of computer and system sciences, 55(1), 119-139.
+
+
+AdaBoost
+“Adaptive Boosting”의 약자 인 AdaBoost는 1996년 Freund와 Schapire가 제안한 최초의 실용적인 부스팅 알고리즘이다. 
+AdaBoost의 목표를 간략히 말하면 약한 분류기를 강력한 분류기로 변환하는 것이라 할 수 있다. 즉, AdaBoost의 분류를 위한 최종 방정식을 살펴보면 다음과 같다.
+
+\[F(x)=sign(\sum_{m=1}^{M}\theta_m f_m(x))\]
+
+위의 식에서 \(f_m(x)\)는 총 \(M\)개의 개별 약한 분류기들을 나타내고 개별 가중치 \(\theta_m\)을 반영하여 가중합을 분류를 위한 최종 방정식(최종 강한 분류기)를 구축한다.
+
+AdaBoost algorithm
+AdaBoost 알고리즘의 전체 과정은 다음과 같이 요약할 수 있다.
+먼저 n개의 데이터 포인트로 구성된 데이터 세트가 주어지면 각각의 데이터 포인트 \(x_i\)에 대하여 레이블 \(y_i\)를 
+-1은 negative class를 나타내고 1은 positive class를 나타내도록 구성할 수 있다.
+
+\[x_i \in \mathbb{R}^d, y_i \in \{-1,1\}\]
+
+다음으로 각 데이터 포인트에 대한 가중치는 다음과 같이 초기화한다.
+
+\[w(x_i,y_i)= \frac{1}{n}, i=1,\ldots,n\]
+
+이후, 총 \(M\)개의 약한 분류기에 대해 아래의 과정을 수행한다.
+
+(1) 각 m번째 시행마다 약한 분류기(ex. Decision Tree)를 데이터 세트로 한번 학습시킨 뒤에 분류 오류를 계산한다.
+
+\[\epsilon_m = E_{w_m}[1_{y \neq f(x)}]\]
+
+(2) m번째 약한 분류기의 개별 가중치 \(\theta_m\)을 다음의 식에 따라 계산한다.
+
+\[\theta_m=\frac{1}{2}ln(\frac{1-\epsilon_m}{\epsilon_m})\]
+
+이때, (2)의 개별 가중치 계산식에 따라 분류 정확도가 50% 이상인 경우 가중치는 양수가 되고 각 개별 분류기가 정확할수록 가중치가 커진다. 
+반대로 정확도가 50% 미만인 분류기의 경우 가중치는 음수가 되는데 이는 정확도가 50% 미만인 경우 음의 가중치로서 최종 예측에 반영이 됨을 의미한다.
+즉, 50% 정확도를 가진 분류기는 아무런 정보를 추가하지 않으므로 최종 예측에 영향을 주지 않는 반면, 정확도가 40%인 분류기는 음의 가중치로 페널티를 가지면서 최종 예측에 기여하게 된다.
+
+(3) 다음으로 각 데이터별 가중치를 업데이트 한다.
+
+\[w_{m+1}(x_i,y_i)=\frac{w_m(x_i,y_i)exp[-\theta_m y_i f_m(x_i)]}{Z_m}\]
+
+이 때 \(Z_m\)은 모든 데이터별 가중치의 총합이 1이 되도록하는 Normalization Factor이다.
+
+위 식을 살펴보면 분류기가 잘못 분류한 데이터 포인트의 경우, 분자에서 지수항(\(exp[-\theta_m y_i f_m(x_i)]\))이 항상 1보다 크게 된다.
+
+\[\because y_i f_m(x_i)=-1 \, \And \, \theta_m\ge0\]
+
+따라서 잘못 분류한 데이터 포인트는 (3)의 과정을 거치고 나면 더 큰 가중치로 업데이트된다. 이 (1)~(3)의 과정을 \(M\)개의 약한 분류기에 대해 모두 수행한 뒤, 각 분류기의 가중합을 통해 최종 예측을 얻는다.
+
+\[F(x)=sign(\sum_{m=1}^{M}\theta_m f_m(x))\]
+
+Additive Logistic Regression: A Statistical View of Boosting
+다음으로 2000년에 Friedman 등이 AdaBoost algorithm을 통계적 관점에서 개선한 논문을 소개한다. 이 논문에서는 AdaBoost를 활용하여 단계적 추정을 통해 최종 로지스틱 회귀 모델을 맞추었다. 
+즉 AdaBoost가 실제로 손실함수를 최소화하고 있음을 보여주었다.
+
+
+
+
+
+``
+
+손실함수는 다음과 같이 표현할 수 있는데,
+
+\[L(y, F(x))=E(e^{-yF(x)})\]
+
+이는 아래와 같은 포인트에서 최소화된다.
+
+\[\frac{\partial E(e^{-yF(x)})}{\partial F(x)}=0\]
+
+AdaBoost의 경우 \(y\)는 -1 또는 1만 될 수 있으므로 손실 함수는 다음과 같이 다시 작성할 수 있다.
+
+\[E(e^{-yF(x)})=e^{F(x)}P(y=-1|x)+e^{-F(x)}P(y=1|x)\]
+
+이를 \(F(x)\)에 대해 풀면, 아래와 같이 계산된다.
+
+\[\frac{\partial E(e^{-yF(x)})}{\partial F(x)}=e^{F(x)}P(y=-1|x)-e^{-F(x)}P(y=1|x)=0\]
+
+\[F(x)=\frac{1}{2}\log{\frac{P(y=1|x)}{P(y=-1|x)}}\]
+
+또한 이 \(F(x)\)의 최적해로부터 로지스틱 모델을 유도할 수 있다.
+
+\[P(y=-1|x)=\frac{e^{2F(x)}}{1+e^{2F(x)}}\]
+
+만일 현재 추정치 \(F(x)\)와 개선된 추정치 \(F(x)+cf(x)\)가 있다면 고정된 \(x\)와 \(c\)에 대해 \(f(x)=0\)에 대한 2차식 \(L(y,F(x)+cf(X))\)을 얻을 수 있다.
+
+\[L(y,F(x)+cf(X))=E(e^{-y(F(x)+cf(x))})\]
+
+\[\approx E(e^{-yF(x)}(1-ycf(x)+(cyf(x))^2/2)))\]
+
+\[=E(e^{-yF(x)}(1-ycf(x)+c^2/2))\]
+
+\[\therefore f(x)=\mathit{argmin}_f E_w(1-ycf(x)+c^2/2|x)\]
+
+이때 \(E_w(1-ycf(x)+c^2/2 \mid x)\)는 가중된 조건부 기대값을 나타내며 각 데이터 포인트에 대한 가중치는 다음과 같이 계산된다.
+
+\[w(x_i,y_i)= e^{-y_i F(x_i)}, i=1,\ldots,n\]
+
+만약 \(c\)가 양수라면 가중된 조건부 기대값을 최소화하는 것은 \(E_w[yf(x)]\)를 최대화하는 것과 같다.
+또한 \(y\)는 1 또는 -1의 값만 가질 수 있으므로 \(E_w[yf(x)]\)는 아래와 같이 쓸 수 있다.
+
+\[E_w[yf(x)]=f(x)P_w(y=1|x)-f(x)P_w(y=-1|x)\]
+
+\[f(n)= \begin{cases}
+1, &amp;amp; \mbox{if } P_w(y=1|x)&amp;gt;P_w(y=-1|x) \\
+-1, &amp;amp; \mbox{if }\mbox{ otherwise.}
+\end{cases}\]
+
+이렇게 \(f(x)\)를 결정한 후 가중치 \(c\)는 \(L(y, F(x) + cf(x))\)를 직접 최소화하여 계산할 수 있다.
+
+\[c=\mathit{argmin}_c E_w(e^{-cyf(x)})\]
+
+\[\frac{\partial E(e^{-cyf(x)}}{\partial c}=E_w(-yf(x)e^{-cyf(x)})=0\]
+
+\[E_w(1_{y \neq f(x)})e^c-E_w(1_{y=f(x)})e^{-c}\]
+
+\(\epsilon\)을 잘못 분류된 케이스들의 가중합과 같이 두면,
+
+\[\epsilon e^{c}-(1-\epsilon)e^{-c}=0\]
+
+\[c=\frac{1}{2}\log{\frac{1-\epsilon}{\epsilon}}\]
+
+즉, 약한 분류기의 정확도가 50% 미만일 경우 c는 음수가 된다.
+또한 모델의 개선 후(\(F(x)+cf(x)\)) 각 개별 데이터 포인트에 대한 가중치는 다음과  같다.
+
+\[w(x_i,y_i)= e^{-y_i F(x_i)-c y_i f(x)}, i=1,\ldots,n\]
+
+그러므로 각 데이터별 가중치는 다음과 같이 업데이트 된다.
+
+\[w(x_i,y_i) \leftarrow w(x_i,y_i)e^{-cf(x_i)y_i}\]
+
+이는 위에서 살펴본 AdaBoost Algorithm과 동일한 형태임을 알 수 있다. 따라서 AdaBoost를 지수 손실함수가 있는 모델의 각 반복 m에서 현재 추정치를 개선하기 위해 약한 분류기에 반복적으로 적합하여 
+순방향 단계적 가산 모델로 해석하는 것이 합리적임을 알 수 있다.
+
+\[w_{m+1}(x_i,y_i)=\frac{w_m(x_i,y_i)exp[-\theta_m y_i f_m(x_i)]}{Z_m}\]
+
+\[\theta_m=\frac{1}{2}ln(\frac{1-\epsilon_m}{\epsilon_m})\]
+
+Code
+Code 수행은 iris 데이터의 분류 문제에 AdaBoost 모델을 적용했다. 데이터는 7:3의 비율로 학습과 테스트 데이터를 나누었다.
+
+AdaBoost의 실제 활용에서는 다음과 같은 단계를 따른다.
+
+  처음에 학습데이터 중 일부를 추출한다.
+  선택되지 않은 나머지 학습데이터로 평가를 진행하면서(Validation Set) 선택된 학습데이터로 AdaBoost 모델을 반복적으로 학습한다.
+  모델이 잘못 분류한 관측치에 더 높은 가중치를 할당하여, 다음 반복에서 이러한 관측치가 높은 분류 확률을 얻도록 학습한다.
+  분류기의 정확도에 따라 각 반복에서 훈련된 분류기에 가중치를 할당한다. 더 정확한 분류기는 높은 가중치를 가진다.
+  이 프로세스는 최종 모델이 학습데이터에 대해 모두 오류없이 적합하거나 지정된 수의 분류기(n_estimators)를 구축할 때까지 반복한다.
+
+
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn import datasets
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+# Load data
+iris = datasets.load_iris()
+X = iris.data
+y = iris.target
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+
+adaboost_classifier = AdaBoostClassifier(n_estimators=50,
+                         learning_rate=1)
+
+AdaBoost에서 가장 중요한 Hyper-parameter는 모델 훈련에 사용되는 약한 분류기인 base_estimator와 반복적으로 훈련할 약한 분류기의 수(\(M\))를 나타내는 n_estimators, 약한 분류기의 가중치에 기여하는 learning_rate이다. 
+base_estimator, 즉 약한 분류기는 sklearn의 AdaBoost 모델의 default 설정 그대로 Decision Tree 모델을 사용하여 모델을 학습시킨 후, 이를 평가했다.
+
+# Train Adaboost Classifer
+model = adaboost_classifier.fit(X_train, y_train)
+
+#Predict the response for test dataset
+y_pred = model.predict(X_test)
+
+# Evaluate Model
+print(&quot;Accuracy:&quot;, accuracy_score(y_test, y_pred))
+
+그 결과 88.88%의 분류 정확도를 얻을 수 있었다.
+Accuracy: 0.8888888888888888
+
+다음으로 약한 분류기를 Support Vector Classifier로 활용한 뒤 최종 AdaBoost 모델을 구축했다.
+from sklearn.svm import SVC
+
+svc=SVC(probability=True, kernel='linear')
+abc =AdaBoostClassifier(n_estimators=50, base_estimator=svc,learning_rate=1)
+
+# Train Adaboost Classifer
+model = abc.fit(X_train, y_train)
+
+#Predict the response for test dataset
+y_pred = model.predict(X_test)
+
+# Model Accuracy, how often is the classifier correct?
+print(&quot;Accuracy:&quot;, accuracy_score(y_test, y_pred))
+
+최종 AdaBoost 모델 구축 시 SVC를 약한 분류기(base estimator)로 활용했을 때 Decision Tree의 경우보다 Iris 데이터에 대하여 더 높은 성능을 보임을 알 수 있었다.
+
+Accuracy: 0.9555555555555556
+
+결론
+이번 논문 구현 과제를 통해 AdaBoost 모델의 기본 개념을 숙지 할 수 있었다. 기본적으로 다양한 분류 모델들을 AdaBoost의 Base Estimator가 되는 약한 분류기로 사용할 수 있고 
+이 약한 분류기의 실수를 반복적으로 수정하고 약한 분류기를 결합하여 정확도를 높이는 과정이기에 구현하기 쉬운 장점이 있다는 것을 알 수 있었다. 하지만 AdaBoost는 각 데이터 포인트에 완벽히 맞추려는
+알고리즘의 특성상 outlier에 민감할 수 밖에 없다. 따라서 이러한 단점을 보완하는 Boosting 계열의 후속 연구들이 이어졌고 추후 나머지 알고리즘에 대해서도 공부해볼 계획이다.
+추가적으로 데이터 사이즈가 클 경우 XGBoost에 비해 AdaBoost가 학습 속도가 느리다는 것을 이번 구현 과정에서 알 수 있었는데 학습 속도의 차이가 나타나는 정확한 이유에 대해서도 살펴볼 생각이다.
+
+
+  참고문헌
+  
+    Freund, Y., &amp;amp; Schapire, R. E. (1997). A decision-theoretic generalization of on-line learning and an application to boosting. Journal of computer and system sciences, 55(1), 119-139.
+    Friedman, J., Hastie, T., &amp;amp; Tibshirani, R. (2000). Additive logistic regression: a statistical view of boosting (with discussion and a rejoinder by the authors). The annals of statistics, 28(2), 337-407.``
+  
+
+</content>
+      <categories>
+        
+          <category> paper </category>
+        
+          <category> ensemble learning </category>
+        
+      </categories>
+      <tags>
+        
+          <tag> anogan </tag>
+        
+      </tags>
+      <tags></tags>
+    </entry>
+  
+    <entry>
+      <title>Unsupervised Anomaly Detection with Generative Adversarial Networks to Guide Marker Discovery</title>
+      <url>/paper/anomaly%20detection/2020/11/15/anogan-paper/</url>
+      <content type="text">논문 선정
+강필성 교수님의 비즈니스 어낼리틱스 수업의 세번째 논문 구현 주제는 Anomaly Detection이다. Anomaly Detection 방법론 중 GAN을 활용하여 
+Anomaly Detection을 수행하는 AnoGAN을 2년 전에 공부를 하며 코딩을 해두었는데 이번 기회에 다시 한 번 코드를 정리할 겸 추가적인 공부를 하기 위해 아래의 논문을 선정하였다.
+
+
+
+
+
+
+  Schlegl, T., Seeböck, P., Waldstein, S. M., Schmidt-Erfurth, U., &amp;amp; Langs, G. (2017, June). Unsupervised anomaly detection with generative adversarial networks to guide marker discovery. In International conference on information processing in medical imaging (pp. 146-157). Springer, Cham.
+
+
+AnoGAN 기본 구조 (학습)
+Unsupervised Anomaly Detection with Generative Adversarial Networks to Guide Marker Discovery 논문에서 소개 된 AnoGAN은 
+Deep Convolutional Generative Adversarial Network (DCGAN)의 구조를 활용하여 정상 데이터의 latent space로 적절하게 매핑이 되는지 여부를 통해
+Anomaly Detection을 수행하는 방법론이다. 아래는 일반적인 DCGAN의 구조와 t-SNE embedding으로 정상(파란색), 비정상(빨간색)를 나타낸다.
+
+
+
+
+
+
+  Generator \(G\) : \(G(z) = z \rightarrow x\) 매핑을 통하여 \(x\)로부터 distribution \(p_g\)를 학습, 이 경우 Convolutional decoder
+  samples \(z\) : Latent space \(Z\)로부터 샘플링 된 1차원의 vector (일반적으로 uniform distribution을 따르는 noise)
+  Image patch \(x\) : image space manifold \(X\)안의 우리가 가지고 있는 정상 이미지 데이터
+  Discriminator \(D\) : 일반적인 CNN 구조로 2D images를 받아서 scalar value \(D(\cdot)\)으로 매핑, 원본 이미지와 Generator로부터 생긴 이미지를 구분
+
+
+\[\min_G \max_D V(D, G) = \mathbb{E}_{\mathbf{x} \sim P_{data}(\mathbf{x})} \big[ \log D(\mathbf{x}) \big] 
++ \mathbb{E}_{\mathbf{z} \sim P_{\mathbf{z}}(\mathbf{z})} \big[ \log \big( 1- D(G(\mathbf{z})) \big) \big]\]
+
+DCGAN은 GAN이 잘 학습되었다고 했을 때, \(z\)는 데이터들을 잘 압축하고 있다고 할 수 있다. 즉, \(z\)의 값들을 연속적으로 변화시키면 이에 맞춰 생성되는 이미지 또한 연속적으로 변화한다. 
+따라서 먼저 정상 데이터들을 사용해서 일반적인 DCGAN을 학습시키고 만약 GAN이 수렴했다면, 정상 데이터의 latent space, (위의 파란색) manifold \(X\)를 학습했다고 할 수 있다.
+
+DCGAN 기본구조 Code
+import tensorflow as tf
+
+def generator(z_in, use_batchnorm=True, use_bias=True):
+    reuse = tf.AUTO_REUSE
+    xavier_init, xavier_init_conv = tf.contrib.layers.xavier_initializer(uniform=True), tf.contrib.layers.xavier_initializer_conv2d(uniform=True)
+    with tf.variable_scope('generator', reuse=reuse):
+        net = tf.layers.dense(inputs=z_in, units=7*7*32, kernel_initializer=xavier_init, use_bias=use_bias, name='layer1/dense', reuse=reuse)
+        net = tf.reshape(net, (-1, 7, 7, 32), name='layer1/reshape')
+        if use_batchnorm:
+            net = tf.layers.batch_normalization(inputs=net, training=is_train, axis=3, name='layer1/batchnorm', reuse=reuse)
+        net = tf.nn.leaky_relu(net, name='layer1/act')
+        
+        net = tf.layers.conv2d_transpose(inputs=net, filters=16, kernel_size=(3, 3), strides=(2, 2), use_bias=use_bias, padding='same',
+                                         kernel_initializer=xavier_init_conv, name='layer2/convtr', reuse=reuse)
+        if use_batchnorm:
+            net = tf.layers.batch_normalization(inputs=net, training=is_train, axis=3, name='layer2/batchnorm', reuse=reuse)
+        net = tf.nn.leaky_relu(net, name='layer2/act')
+        
+        net = tf.layers.conv2d_transpose(inputs=net, filters=8, kernel_size=(3, 3), strides=(2, 2), use_bias=use_bias, padding='same',
+                                         kernel_initializer=xavier_init_conv, name='layer3/convtr', reuse=reuse)
+        if use_batchnorm:
+            net = tf.layers.batch_normalization(inputs=net, training=is_train, axis=3, name='layer3/batchnorm', reuse=reuse)
+        net = tf.nn.leaky_relu(net, name='layer3/act')
+        
+        net = tf.layers.conv2d_transpose(inputs=net, filters=1, kernel_size=(3, 3), strides=(1, 1), use_bias=use_bias, padding='same',
+                                         kernel_initializer=xavier_init_conv, name='layer4/output', reuse=reuse)
+    return tf.tanh(net)
+        
+def discriminator(x_in, use_batchnorm=False, use_bias=True):
+    reuse = tf.AUTO_REUSE
+    xavier_init_conv = tf.contrib.layers.xavier_initializer_conv2d(uniform=True)
+    with tf.variable_scope('discriminator', reuse=reuse):
+        net = tf.layers.conv2d(inputs=x_in, filters=16, kernel_size=(3, 3), strides=(2, 2), use_bias=use_bias, padding='same',
+                               kernel_initializer=xavier_init_conv, name='layer1/conv', reuse=reuse)
+        if use_batchnorm:
+            net = tf.layers.batch_normalization(inputs=net, training=is_train, axis=3, name='layer1/batchnorm', reuse=reuse)
+        net = tf.nn.leaky_relu(net, name='layer1/act')
+        
+        net = tf.layers.conv2d(inputs=net, filters=32, kernel_size=(3, 3), strides=(2, 2), use_bias=use_bias, padding='same',
+                               kernel_initializer=xavier_init_conv, name='layer2/conv', reuse=reuse)
+        if use_batchnorm:
+            net = tf.layers.batch_normalization(inputs=net, training=is_train, axis=3, name='layer2/batchnorm', reuse=reuse)
+        net = tf.nn.leaky_relu(net, name='layer2/act')
+        
+        net = tf.layers.flatten(net, name='layer3/act')
+        net = tf.layers.dense(inputs=net, units=1, name='layer3/output')
+    return net
+
+def chunks(l, n):
+    for i in range(0, len(l), n):
+        yield l[i:i+n]
+
+z_dim          = 50
+is_train       = tf.placeholder(tf.bool, name='is_train')
+z              = tf.placeholder(dtype=tf.float32, shape=[None, z_dim], name='z')
+x              = tf.placeholder(dtype=tf.float32, shape=[None, 28, 28, 1])
+G              = generator(z)
+D_real, D_fake = discriminator(x), discriminator(G)
+d_loss_real    = tf.nn.sigmoid_cross_entropy_with_logits(logits=D_real, labels=tf.ones_like(D_real))
+d_loss_fake    = tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake, labels=tf.zeros_like(D_fake))
+g_loss         = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake, labels=tf.ones_like(D_fake)))
+d_loss         = tf.reduce_mean(d_loss_real) + tf.reduce_mean(d_loss_fake)
+d_acc          = tf.reduce_mean(tf.cast(tf.equal(tf.concat([tf.ones_like(D_real, tf.int32), tf.zeros_like(D_fake, tf.int32)], 0),
+                                                 tf.concat([tf.cast(tf.greater(D_real, 0.5), tf.int32), tf.cast(tf.greater(D_fake, 0.5), tf.int32)], 0)), tf.float32))
+g_vars         = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='generator')
+d_vars         = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='discriminator')
+update_ops     = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+d_update_ops   = [var for var in update_ops if 'discriminator' in var.name]
+g_update_ops   = [var for var in update_ops if 'generator' in var.name]
+
+with tf.control_dependencies(d_update_ops):
+    d_opt1 = tf.train.AdamOptimizer(learning_rate=1E-3, name='D-optimizer-1').minimize(loss=d_loss, var_list=d_vars)
+    d_opt2 = tf.train.AdamOptimizer(learning_rate=1E-4, name='D-optimizer-2').minimize(loss=d_loss, var_list=d_vars)
+    
+with tf.control_dependencies(g_update_ops):
+    g_opt1 = tf.train.AdamOptimizer(learning_rate=1E-3, name='G-optimizer-1').minimize(loss=g_loss, var_list=g_vars)
+    g_opt2 = tf.train.AdamOptimizer(learning_rate=1E-4, name='G-optimizer-2').minimize(loss=g_loss, var_list=g_vars)
+
+
+AnoGAN 기본 구조 (테스트)
+
+
+
+
+
+DCGAN의 학습이 완료되었다면 테스트를 통해 궁금한 데이터의 정상 여부를 판단해야 한다. 하지만 \(\mathbf{z} \rightarrow \mathbf{x}\)로 매핑하는 것은 
+Generator \(G(\mathbf{z}) = \mathbf{z} \rightarrow \mathbf{x}\)를 통하여 가능하지만 그 반대의 상황인 원본 이미지를 통해 \(\mathbf{x} \rightarrow \mathbf{z}\)로 
+매핑하는 것은 어렵다.
+즉, 원본 이미지를 통해 latent space \(\mathbf{z}\)로 매핑하는 작업(\(G^{-1}(\mathbf{x}) = \mathbf{x} \rightarrow \mathbf{z}\))을 \(G\)와 \(D\)만으로는 할 수가 없다.
+
+그래서 AnoGAN은 query image \(\mathbf{x}\)가 주어졌을때, 해당 이미지 \(\mathbf{x}\)와 가장 유사한 이미지 \(G(\mathbf{z})\)를 생성하는 \(\mathbf{z}\)를 찾아낸다. 
+가장 최적화된 \(\mathbf{z}\)를 찾기 위해서 먼저 학습과정에서 사용한 분포 \(\mathbf{p_z}\)에서 임의의 노이즈 \(\mathbf{z_1}\)을 추출하고 \(G(\mathbf{z_1})\)을 통해 가짜 이미지를 생성한다. 
+이렇게 만들어 낸 이미지에서 Residual Loss 그리고 Discrimination Loss로 이루어 진 loss function을 통해 gradients를 계산하고 
+backpropagation을 통해서 \(\mathbf{z_1}\)의 coefficients를 업데이트한다. 이렇게 만들어진 값이 다시 \(\mathbf{z_2}\)가 되고 이 과정을 반복하여
+얻어진 \(G(\mathbf{z}_\gamma)\)이 \(\mathbf{x}\)와 얼마나 유사했는지를 판단하여 정상 여부를 결정한다. 이때 이 과정은 \(G\)와 \(D\)의 parameter들은 고정한 상태에서 진행된다. 결과적으로 query image \(\mathbf{x}\)가 정상 데이터라면 
+latent space로의 매핑이 가능해 loss가 적게 발생하겠지만 비정상 데이터라면 큰 차이의 loss가 생기게 된다.
+
+좀 더 구체적으로 Residual Loss 그리고 Discrimination Loss로 이루어 진 loss function을 설명해보자.
+
+Residual Loss
+Residual Loss는 Generator로 부터 만들어 낸 image(\(G(\mathbf{z}_\gamma)\))와 query image \(\mathbf{x}\) 간의 시각적 차이를 나타낸다. 이는 아래의 식으로 표현할 수 있다.
+
+\[L_R \left(\mathbf{z}_{\gamma} \right) = \sum \big|\ \mathbf{x} - G(\mathbf{z}_\gamma) \ \big|\]
+
+만약 완벽한 \(G\)를 통해 latent space로 완전한 대응이 가능하다면 정상 이미지 \(\mathbf{x}\)가 입력되었을 때, \(\mathbf{x}\)와 \(G(\mathbf{z}_\gamma)\)는 
+동일하게 되어 Residual loss는 0이 된다. 코드로는 Residual Loss를 다음과 같이 표현할 수 있다.
+
+residual_loss = tf.reduce_mean(tf.abs(target_x - mapped_x), axis=[1, 2, 3])
+
+
+Discrimination Loss
+Discriminator \(D\)의 역할은 Generator로부터 생성된 가짜 이미지인지 진짜 원본 이미지인지를 판단하는 것이다. 즉, \(D\)는 학습 데이터의 분포를 파악하는 역할을 한다고 생각할 수 있다. 
+AnoGAN의 Discrimination loss는 Generator로 부터 만들어 낸 image(\(G(\mathbf{z}_\gamma)\))가 manifold 혹은 데이터의 분포에 잘 위치하도록 페널티를 부과하는 역할을 한다. 
+즉 Discrimination loss값을 구해서 \(\mathbf{z}_\gamma\)를 업데이트하는데 사용된다.
+
+\[L_D(\mathbf{z}_\gamma) = \sum \big\| \mathbf{f}(\mathbf{x}) - \mathbf{f}(G(\mathbf{z}_\gamma)) \big\|\]
+
+\(\mathbf{f}\)는 feature mapping에서 나온 개념으로 discriminator의 중간층에 있는 activations들을 가르킨다. 
+즉 AnoGAN은 Discriminator \(D\)의 최종 출력(0 또는 1)을 사용하지 않고 중간 레이어에서의 결과값을 통해 Discrimination loss를 구성한다. 
+논문에서는 이 discriminator의 중간층에 있는 activations들이 더 풍부한 표현력을 가지고 있기 때문이라고 설명한다. 코드로는 Discrimination Loss를 다음과 같이 표현할 수 있다.
+
+discrimination_loss = tf.reduce_mean(tf.abs(target_d_feature - mapped_d_feature), axis=[1, 2, 3])
+
+
+최종 loss는 이 둘의 weighted sum이다.
+
+\[L(\mathbf{z}_\gamma) = (1-\lambda) \cdot L_R(\mathbf{z}_\gamma) + \lambda \cdot L_D (\mathbf{z}_\gamma)\]
+
+로 표현한다. 위의 loss를 바탕으로 backpropagation 방식으로 \(\mathbf{z}_\gamma\)를 업데이트시킨다. 
+즉 \(G\)와 \(D\) parameter들은 고정된 상태로 \(\mathbf{z}\)의 coefficients를 업데이트한다.
+일정 횟수 동안 업데이트가 진행되면 마지막으로 loss를 구한다음, 이 loss가 특정값 미만이면 정상, 
+특정값 이상이면 비정상으로 판단하게 된다. 즉, 낮은 loss는 입력과 유사한 데이터를 학습 과정에서 봤고, manifold에 적절한 매핑이 가능하다는 의미지만, 
+높은 loss는 적절한 매핑을 찾는데 실패했다는 의미로 해석할 수 있다. 논문에서는 총 500번 \(\mathbf{z}\)의 coefficients를 업데이트하는 과정을 수행하였고 
+두 loss의 weight parameter로 작용하는 \(\lambda\)는 0.1로 설정했다. 코드로 전체 Loss를 표현하면 다음과 같다.
+
+mapping_loss = (1-lam)*residual_loss + lam*discrimination_loss
+
+Anomaly Detection with AnoGAN (python 3.6, tensorflow 1.15)
+앞서 소개한대로 DCGAN의 일반적인 구조에 AnoGAN의 최종 loss를 추가하여 Anomaly Detection을 수행하는 코드는 다음과 같다. 먼저 정상 데이터들로 DCGAN을 학습시키고,
+
+import tensorflow as tf
+import numpy as np
+from tqdm import tqdm
+import matplotlib.pyplot as plt
+
+from tensorflow.examples.tutorials.mnist import input_data
+mnist = input_data.read_data_sets('MNIST_data/', one_hot=False, reshape=False)
+
+def generator(z_in, use_batchnorm=True, use_bias=True):
+    reuse = tf.AUTO_REUSE
+    xavier_init, xavier_init_conv = tf.contrib.layers.xavier_initializer(uniform=True), tf.contrib.layers.xavier_initializer_conv2d(uniform=True)
+    with tf.variable_scope('generator', reuse=reuse):
+        net = tf.layers.dense(inputs=z_in, units=7*7*32, kernel_initializer=xavier_init, use_bias=use_bias, name='layer1/dense', reuse=reuse)
+        net = tf.reshape(net, (-1, 7, 7, 32), name='layer1/reshape')
+        if use_batchnorm:
+            net = tf.layers.batch_normalization(inputs=net, training=is_train, axis=3, name='layer1/batchnorm', reuse=reuse)
+        net = tf.nn.leaky_relu(net, name='layer1/act')
+        
+        net = tf.layers.conv2d_transpose(inputs=net, filters=16, kernel_size=(3, 3), strides=(2, 2), use_bias=use_bias, padding='same',
+                                         kernel_initializer=xavier_init_conv, name='layer2/convtr', reuse=reuse)
+        if use_batchnorm:
+            net = tf.layers.batch_normalization(inputs=net, training=is_train, axis=3, name='layer2/batchnorm', reuse=reuse)
+        net = tf.nn.leaky_relu(net, name='layer2/act')
+        
+        net = tf.layers.conv2d_transpose(inputs=net, filters=8, kernel_size=(3, 3), strides=(2, 2), use_bias=use_bias, padding='same',
+                                         kernel_initializer=xavier_init_conv, name='layer3/convtr', reuse=reuse)
+        if use_batchnorm:
+            net = tf.layers.batch_normalization(inputs=net, training=is_train, axis=3, name='layer3/batchnorm', reuse=reuse)
+        net = tf.nn.leaky_relu(net, name='layer3/act')
+        
+        net = tf.layers.conv2d_transpose(inputs=net, filters=1, kernel_size=(3, 3), strides=(1, 1), use_bias=use_bias, padding='same',
+                                         kernel_initializer=xavier_init_conv, name='layer4/output', reuse=reuse)
+    return tf.tanh(net)
+        
+def discriminator(x_in, use_batchnorm=False, use_bias=True):
+    reuse = tf.AUTO_REUSE
+    xavier_init_conv = tf.contrib.layers.xavier_initializer_conv2d(uniform=True)
+    with tf.variable_scope('discriminator', reuse=reuse):
+        net = tf.layers.conv2d(inputs=x_in, filters=16, kernel_size=(3, 3), strides=(2, 2), use_bias=use_bias, padding='same',
+                               kernel_initializer=xavier_init_conv, name='layer1/conv', reuse=reuse)
+        if use_batchnorm:
+            net = tf.layers.batch_normalization(inputs=net, training=is_train, axis=3, name='layer1/batchnorm', reuse=reuse)
+        net = tf.nn.leaky_relu(net, name='layer1/act')
+        
+        net = tf.layers.conv2d(inputs=net, filters=32, kernel_size=(3, 3), strides=(2, 2), use_bias=use_bias, padding='same',
+                               kernel_initializer=xavier_init_conv, name='layer2/conv', reuse=reuse)
+        if use_batchnorm:
+            net = tf.layers.batch_normalization(inputs=net, training=is_train, axis=3, name='layer2/batchnorm', reuse=reuse)
+        net = tf.nn.leaky_relu(net, name='layer2/act')
+        
+        net = tf.layers.flatten(net, name='layer3/act')
+        net = tf.layers.dense(inputs=net, units=1, name='layer3/output')
+    return net
+
+def chunks(l, n):
+    for i in range(0, len(l), n):
+        yield l[i:i+n]
+
+z_dim          = 50
+is_train       = tf.placeholder(tf.bool, name='is_train')
+z              = tf.placeholder(dtype=tf.float32, shape=[None, z_dim], name='z')
+x              = tf.placeholder(dtype=tf.float32, shape=[None, 28, 28, 1])
+G              = generator(z)
+D_real, D_fake = discriminator(x), discriminator(G)
+d_loss_real    = tf.nn.sigmoid_cross_entropy_with_logits(logits=D_real, labels=tf.ones_like(D_real))
+d_loss_fake    = tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake, labels=tf.zeros_like(D_fake))
+g_loss         = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake, labels=tf.ones_like(D_fake)))
+d_loss         = tf.reduce_mean(d_loss_real) + tf.reduce_mean(d_loss_fake)
+d_acc          = tf.reduce_mean(tf.cast(tf.equal(tf.concat([tf.ones_like(D_real, tf.int32), tf.zeros_like(D_fake, tf.int32)], 0),
+                                                 tf.concat([tf.cast(tf.greater(D_real, 0.5), tf.int32), tf.cast(tf.greater(D_fake, 0.5), tf.int32)], 0)), tf.float32))
+g_vars         = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='generator')
+d_vars         = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='discriminator')
+update_ops     = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+d_update_ops   = [var for var in update_ops if 'discriminator' in var.name]
+g_update_ops   = [var for var in update_ops if 'generator' in var.name]
+
+with tf.control_dependencies(d_update_ops):
+    d_opt1 = tf.train.AdamOptimizer(learning_rate=1E-3, name='D-optimizer-1').minimize(loss=d_loss, var_list=d_vars)
+    d_opt2 = tf.train.AdamOptimizer(learning_rate=1E-4, name='D-optimizer-2').minimize(loss=d_loss, var_list=d_vars)
+    
+with tf.control_dependencies(g_update_ops):
+    g_opt1 = tf.train.AdamOptimizer(learning_rate=1E-3, name='G-optimizer-1').minimize(loss=g_loss, var_list=g_vars)
+    g_opt2 = tf.train.AdamOptimizer(learning_rate=1E-4, name='G-optimizer-2').minimize(loss=g_loss, var_list=g_vars)
+    
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+sess = tf.Session(config=config)
+sess.run(tf.global_variables_initializer())
+
+train_dat = mnist.train.images*2 - 1
+n_train = len(train_dat)
+
+max_epoch = 200
+minibatch_size = 256
+
+pbar = tqdm(range(max_epoch))
+
+d_opt, g_opt = d_opt1, g_opt1
+g_loss_traj, d_loss_traj = [], []
+for epoch in pbar:
+    train_idx = np.arange(n_train)
+    np.random.shuffle(train_idx)
+    train_batch = chunks(train_idx, minibatch_size)
+    
+    if epoch == 150:
+        d_opt, g_opt = d_opt2, g_opt2
+        
+    g_loss_stack, d_loss_stack, d_acc_stack = [], [], []
+    for batch_idx in train_batch:
+        batch_x = train_dat[batch_idx]
+        batch_z = np.random.uniform(-1, 1, size=[len(batch_idx), z_dim])
+        D_loss, D_acc, _ = sess.run([d_loss, d_acc, d_opt], feed_dict={x: batch_x, z: batch_z, is_train: True})
+        _         = sess.run(g_opt,           feed_dict={z: batch_z, is_train: True})
+        G_loss, _ = sess.run([g_loss, g_opt], feed_dict={z: batch_z, is_train: True})
+        
+        g_loss_stack.append(G_loss)
+        d_loss_stack.append(D_loss)
+        d_acc_stack.append(D_acc)
+        
+    g_loss_traj.append(np.mean(g_loss_stack))
+    d_loss_traj.append(np.mean(d_loss_stack))
+    pbar.set_description('G-loss: {:.4f} | D-loss: {:.4f} | D-accuracy: {:.4f}'.format(np.mean(g_loss_stack), np.mean(d_loss_stack), np.mean(d_acc_stack)))
+    
+plt.plot(g_loss_traj); plt.plot(d_loss_traj); plt.show()
+
+batch_z = np.random.uniform(-1, 1, size=[16, z_dim])
+samples = sess.run(G, feed_dict={z: batch_z, is_train: False})
+
+plt.figure(figsize=(10, 10))
+for i, sample in enumerate(samples):
+    plt.subplot(4, 4, i+1)
+    plt.imshow(sample.reshape(28, 28), cmap='gray')
+plt.show()
+
+
+DCGAN의 학습과정에서 얻어진 분포 \(\mathbf{p_z}\)에서 임의의 노이즈 \(\mathbf{z}\)을 추출하고 \(G\)와 \(D\)의 parameter들은 고정한 상태에서 
+\(\mathbf{z}\)의 coefficients를 업데이트하는 과정을 일정 횟수 반복한 뒤,
+최종적으로 얻어진 \(\mathbf{z}_\gamma\)로부터 생성 된 \(G(\mathbf{z}_\gamma)\)이 \(\mathbf{x}\)와 얼마나 유사했는지를 판단하여 정상 여부를 결정한다. 
+즉, 정상 데이터의 latent space로 적절하게 매핑이 되는지 여부를 통해 데이터의 정상여부를 판단한다.
+
+### AnoGAN - mapping new observations to the latent space
+def get_discriminator_feature(x_in, use_batchnorm=False, use_bias=True):
+    reuse = True
+    xavier_init_conv = tf.contrib.layers.xavier_initializer_conv2d(uniform=True)
+    with tf.variable_scope('discriminator', reuse=reuse):
+        net = tf.layers.conv2d(inputs=x_in, filters=16, kernel_size=(3, 3), strides=(2, 2), use_bias=use_bias, padding='same',
+                               kernel_initializer=xavier_init_conv, name='layer1/conv', reuse=reuse)
+        if use_batchnorm:
+            net = tf.layers.batch_normalization(inputs=net, training=False, axis=3, name='layer1/batchnorm', reuse=reuse)
+        net = tf.nn.leaky_relu(net, name='layer1/act')
+
+    return net
+
+target_x            = tf.placeholder(dtype=tf.float32, shape=[1, 28, 28, 1], name='target_x')
+target_z            = tf.get_variable('anogan/target_z', shape=[1, z_dim], initializer=tf.random_uniform_initializer(-1, 1), trainable=True)
+mapped_x            = generator(target_z)
+target_d_feature    = get_discriminator_feature(target_x)
+mapped_d_feature    = get_discriminator_feature(mapped_x)
+lam                 = 0.7
+anogan_var          = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='anogan')
+residual_loss       = tf.reduce_mean(tf.abs(target_x - mapped_x), axis=[1, 2, 3])
+discrimination_loss = tf.reduce_mean(tf.abs(target_d_feature - mapped_d_feature), axis=[1, 2, 3])
+mapping_loss        = (1-lam)*residual_loss + lam*discrimination_loss
+mapping_loss_opt1   = tf.train.AdamOptimizer(learning_rate=1E-1, name='mapping-optimizer-1').minimize(loss=mapping_loss, var_list=anogan_var)
+mapping_loss_opt2   = tf.train.AdamOptimizer(learning_rate=1E-2, name='mapping-optimizer-2').minimize(loss=mapping_loss, var_list=anogan_var)
+
+uninitialized_variables = [var for var in tf.global_variables() if not(sess.run(tf.is_variable_initialized(var)))]
+sess.run(tf.variables_initializer(uninitialized_variables))
+
+query_x = mnist.test.images[2].reshape(1, 28, 28, 1)
+sess.run(tf.variables_initializer(anogan_var))
+mapping_loss_traj = []
+mapping_loss_opt = mapping_loss_opt1
+for i in range(150):
+    if i == 50:
+        mapping_loss_opt = mapping_loss_opt2
+    loss, _ = sess.run([mapping_loss, mapping_loss_opt], feed_dict={target_x: query_x, is_train: False})
+    mapping_loss_traj.extend(loss)
+
+anomaly_score = mapping_loss[-1]
+
+### Comparison of Query Image and Mapped Image
+generated_x = sess.run(generator(target_z), feed_dict={is_train: False})
+plt.figure(figsize=(14, 4))
+plt.subplot(1, 3, 1)
+plt.imshow(generated_x.reshape(28, 28), cmap='gray')
+plt.title('Mapped Image')
+plt.subplot(1, 3, 2)
+plt.imshow(query_x.reshape(28, 28), cmap='gray')
+plt.title('Query Image')
+plt.subplot(1, 3, 3)
+plt.plot(mapping_loss_traj)
+plt.title('Mapping loss per iteration')
+plt.show()
+plt.close()
+
+
+결론
+이번 논문 구현 과제를 통해 오래 전에 작성한 코드와 논문을 다시 복습할 수 있는 기회를 가졌다. 당시 GAN과 Auto-Encoder 관련 논문을 읽고 코드로 구현을 해두었는데
+시간이 지나니 많은 부분 기억이 잘 나지 않아 다시 공부를 해야 했다. 추후 시간이 날 때마다 AnoGAN 뿐만 아니라 구현해두었던 InfoGAN, Wasserstein GAN, Bidectional GAN, VAE, AAE 등을 정리하여 
+포스팅해두어야 겠다.
+
+
+  참고문헌
+  
+    Schlegl, T., Seeböck, P., Waldstein, S. M., Schmidt-Erfurth, U., &amp;amp; Langs, G. (2017, June). Unsupervised anomaly detection with generative adversarial networks to guide marker discovery. In International conference on information processing in medical imaging (pp. 146-157). Springer, Cham. 
+    Radford, A., Metz, L., &amp;amp; Chintala, S. (2015). Unsupervised representation learning with deep convolutional generative adversarial networks. arXiv preprint arXiv:1511.06434.
+  
+
+</content>
+      <categories>
+        
+          <category> paper </category>
+        
+          <category> anomaly detection </category>
+        
+      </categories>
+      <tags>
+        
+          <tag> anogan </tag>
+        
+      </tags>
+      <tags></tags>
+    </entry>
+  
+    <entry>
+      <title>Gaussian Process for Regression</title>
+      <url>/paper/kernel%20method/2020/10/31/gpr-paper/</url>
+      <content type="text">논문 선정
+강필성 교수님의 비즈니스 어낼리틱스 수업의 두번째 논문 구현 주제는 Kernel-based Leanring이다. Kernel-based Method 중 Gaussian Process를
+이 기회를 통해 이해하고자 아래의 논문을 선정하였다.
+
+
+
+
+
+
+  Ebden, M. Gaussian Processes for Regression: A Quick Introduction (Robotics Research Group, University of Oxford, 2008)
+
+
+MOTIVATION
+다음과 같이 독립 변수 \(x\)의 특정 값에서 종속 변수 \(y\)에 대해 노이즈가 있는 관측치가 주어졌을 때
+
+\[\mathcal{D} = [(\mathbf{x}_1, y_1) \dots (\mathbf{x}_n, y_n)]\]
+
+\[\mathbf{x} \in \mathbb{R}^D\]
+
+\[y \in \mathbb{R}\]
+
+일반적인 회귀 문제는 각 관측 값 \(y\)는 함수 \(f(x)\)와 가우시안 분포를 따르는 노이즈로 분해할 수 있다.
+
+\[y = f(x) + \epsilon\]
+
+\[\epsilon \sim \mathcal{N}(0, \sigma_n^2)\]
+
+이를 통하여 새로운 데이터 포인트 \(x_*\)가 주어지면 해당하는 종속 변수 \(y_*\)에 대한 최적의 추정치를 찾아낼 수 있다.
+만일 함수 \(f(x)\)가 선형임을 가정한다면 최소제곱법을 사용하여 최적의 추정치를 찾아내는 선 \(f(x)\)를 구할 수 있다 (선형 회귀).
+하지만 대개의 경우 \(x\)와 \(y\)가 선형의 관계를 띈다는 선형 모델의 가정이 유효하지 않으므로 입력 데이터 \(x\)를 더 높은 차원의 공간에 투영한 다음 선형 모델을 적용한다.
+
+\[\mathbf{\phi(x)} \in \mathbb{R}^M \, ,where \, M&amp;gt;D\]
+
+\[y = f(\phi(x)) + \epsilon\]
+
+\[\epsilon \sim \mathcal{N}(0, \sigma_n^2)\]
+
+예를 들어 \(\phi(x)\)를 2차, 3차 또는 nonpolynomial 함수를 사용하면 보다 고차원 공간에서 다항식 회귀를 수행할 수 있다.
+하지만 이렇게 복잡한 함수의 회귀를 수행할 수 있게끔 하는 함수 \(f(\phi(x))\)를 어떻게 선택해야 할지의 문제가 남아 있다. 
+가우시안 프로세스는 이 기저함수가 특정한 모델 (eg. \(f(x)=mx+c\)))을 가진다는 가정 대신에 데이터가 기저함수의 정확한 형태에 영향을 끼치도록 보다 일반적이고 유연한 방식으로 함수를 표현할 수 있게끔 한다. 
+즉, 가우시안 프로세스는 기저함수를 명시적으로 지정할 필요가 없다.
+
+DEFINITION OF A GAUSSIAN PROCESS
+가우시안 프로세스는 다변량 가우시안 분포를 무한 차원으로 확장한 형태이다.
+예를 들어 무한 차원의 벡터를 연속형 값을 인풋으로 받아 인덱싱된 값들을 반환하는 일종의 함수로 생각해보자.
+이 개념을 무한 차원의 다변량 가우시안 분포에 적용하면 이것이 바로 가우시안 프로세스이다. 
+
+가우시안 프로세스에서 얼핏 무한한 함수 공간상에서 분포를 고려하는 것이 쉽지 않아 보이지만 실제로 가우시안 프로세스는 Training Dataset과 
+Test Dataset의 데이터 포인트들에 해당하는 입력 포인트 \(x_n\)의 유한 집합 내에서의 함숫값만을 고려하면 된다.
+보다 쉽게 말하면 우리가 보유하고 있는 각 n개의 관측치 \(y = (y_1 \dots y_n)\)는 일부 \(n\) 변량의 다변량 가우시안 분포에서 
+샘플링된 단일 점으로 생각할 수 있다. 이를 거꾸로 추론하는 것이 가우시안 프로세스이다. 
+
+다변량 가우시안 분포는 단일 유한 차원 평균 벡터와 단일 유한 차원 공분산 행렬에 의해 완전히 지정되지만 
+가우시안 프로세스에서는 정의된 유한 부분 집합에 대한 다변량 가우시안 분포가 여러 차원을 가질 수 있기 때문에 이를 활용할 수 없다.
+대신 각 요소별 평균 함수 \(m(x)\)와 요소별 공분산 함수(커널 함수) \(k(x, x\prime)\)로 가우시안 프로세스를 나타낸다.
+
+\[m(x) = E[f(x)]\]
+
+\[k(x, x\prime) = E[f(x_i)-m(x_i)(f(x_j)-m(x_j))]\]
+
+다시 앞선 일반적인 회귀 문제의 모형을 생각해보자. 
+회귀 문제의 목표는 데이터가 주어졌을 때 이를 표현하는 어떤 함수 \(f(x)\)를 학습하고 찾아내는 것이다. 
+가우시안 프로세스는 평균 함수와 공분산 함수를 통해 \(f(x)\)의 분포를 정의한다.
+
+\[f(x) \sim GP(m(x), k(x, x\prime))\]
+
+Training Dataset과 Test Dataset의 유한한 데이터 집합의 각 요소별 평균 벡터와 공분산 행렬은 이 \(m(x)\)와 
+\(k(x, x\prime)\)의 요소별 값을 이용하여 쉽게 구할 수 있다. 즉, \(\mathbf{f} = (f_{\mathbf{x}_1}, \dots f_{\mathbf{x}_n})\)는 
+\(\mathbf{f} \sim \mathcal{N}(\bar{\mathbf{f}}, K(X, X))\)으로 나타낼 수 있다.
+
+\[\bar{\mathbf{f}} = \begin{pmatrix} m(\mathbf{x}_1) \\ \vdots \\ m(\mathbf{x}_n) \end{pmatrix}\]
+
+\[K(X, X) = \begin{bmatrix} k(\mathbf{x}_1, \mathbf{x}_1) &amp;amp; \ldots &amp;amp; k(\mathbf{x}_1, \mathbf{x}_n) \\ \vdots &amp;amp; \ddots &amp;amp; \vdots \\ k(\mathbf{x}_n, \mathbf{x}_1) &amp;amp; \ldots &amp;amp; k(\mathbf{x}_n, \mathbf{x}_n) \end{bmatrix}\]
+
+대부분의 경우 평균 함수로 얻을 수 있는 정보는 별로 없기에 가우시안 프로세스의 평균 \(m(x)\)를 단순한 설정을 위해 
+0으로 가정하므로 하나의 관측치를 다른 관측치와 연결시켜 파라미터를 추론해야 하는 것은 공분산 함수 \(k(x, x\prime)\) 뿐이다.
+논문에서는 공분산 함수의 형태를 Squared Exponential를 사용했고 이는 \(x\)와 \(x\prime\)이 유사한 값을 가질 수록 최대 허용 공분산 \(\sigma_f^2\)에 수렴하는 함수이다. 
+즉, \(x\)와 \(x\prime\)이 유사하여 \(k(x, x\prime)\)이 최대 허용 공분산이 되면 \(f(x)\)와 \(f(x\prime)\)는 완벽한 상관관계를 지닌다고 해석할 수 있다. 
+반대로 새로운 \(x\) 값이 추가될 때 먼 곳에 있는 관측값들은 큰 영향을 미칠 수 없도록 \(x\)와 \(x\prime\)이 멀어질 때 \(k(x, x\prime)\)은 0에 수렴하도록 구성되어 있다.
+
+\[k(x, x\prime) = \sigma_f^2 exp( - \frac{( x - x\prime)^2}{2l^2} )\]
+
+REPRODUCTION
+
+먼저 코드 구현을 위해 가우시안 프로세스 regression의 전체 골격을 잡아두자
+
+code1
+class GPR():
+    def __init__(self, kernel, optimizer='L-BFGS-B', noise_var=1e-8):
+        self.kernel = kernel
+        self.noise_var = noise_var
+        self.optimizer = optimizer
+    
+    def sample_prior(self, X_test, n_samples):
+        pass
+    def sample_posterior(self, X_test, n_samples):
+        pass
+    def log_marginal_likelihood(self, theta=None, eval_gradient=None):
+        pass
+    def optimize(self, theta, X_train, y_train):
+        pass
+    
+    def _cholesky_factorise(y_cov):
+        pass
+    def _sample_multivariate_gaussian(y_mean, y_cov):
+        pass
+
+
+Kernel functions
+다음으로 가우시안 프로세스의 구성요소 중 가장 중요한 커널 함수 \(k(x, x\prime)\)를 구현을 해보자. 논문에서 사용한 커널 함수인 Squared Exponential 외에 Linear Kernel과 Periodic Kernel을 모두 구현하였다.
+각 커널 함수는 모두 symmetric positive semi-definite 공분산 행렬을 구성한다. 코드를 살펴보면 theta 변수와 bounds 변수를 통해 커널 파라미터 \(l\)과 \(\sigma_f^2\)를 조절하도록 하였다.
+또한 요소별 공분산 행렬을 for 루프를 통해 구현할 수 있지만 보다 효율적으로 계산하기 위해 numpy 자료형에 최적화된 scipy의 pdist와 cdist를 통해 구현하였다. 
+scipy 의 cdist 함수는 두 개의 자료형 A, B 를 받아서 AxB의 모든 페어에 대한 계산 결과를 2차원 배열로 리턴하고 pdist는 한 자료 안에서 객체 간의 pairwise distance를 리턴한다.
+
+Linear :
+
+\[k(\mathbf{x}_i, \mathbf{x}_j) = \sigma_f^2\mathbf{x}_i^T \mathbf{x}_j\]
+
+Squared Exponential :
+
+\[k(\mathbf{x}_i, \mathbf{x}_j) = \text{exp} \left(\frac{-1}{2l^2} (\mathbf{x}_i - \mathbf{x}_j)^T (\mathbf{x}_i - \mathbf{x}_j)\right)\]
+
+Periodic :
+
+\[k(\mathbf{x}_i, \mathbf{x}_j) = \text{exp}\left(-\sin(2\pi f(\mathbf{x}_i - \mathbf{x}_j))^T \sin(2\pi f(\mathbf{x}_i - \mathbf{x}_j))\right)\]
+
+code2
+from scipy.spatial.distance import pdist, cdist, squareform
+class Linear():
+    def __init__(self, signal_variance=1.0, signal_variance_bounds=(1e-5, 1e5)):
+        self.theta = [signal_variance]
+        self.bounds = [signal_variance_bounds]
+    def __call__(self, X1, X2=None):
+        if X2 is None:
+            K = self.theta[0] * np.dot(X1, X1.T)
+        else:
+            K = self.theta[0] * np.dot(X1, X2.T)
+        return K
+     
+class SquaredExponential():
+    def __init__(self, length_scale=1.0, length_scale_bounds=(1e-5, 1e5)):
+        self.theta = [length_scale]
+        self.bounds = [length_scale_bounds]
+    def __call__(self, X1, X2=None):
+        if X2 is None:
+            # K(X1, X1) is symmetric so avoid redundant computation using pdist.
+            dists = pdist(X1 / self.theta[0], metric='sqeuclidean')
+            K = np.exp(-0.5 * dists)
+            K = squareform(K)
+            np.fill_diagonal(K, 1)
+        else:
+            dists = cdist(X1 / self.theta[0], X2 / self.theta[0], metric='sqeuclidean')
+            K = np.exp(-0.5 * dists)
+        return K
+       
+class Periodic():
+    def __init__(self, frequency=1.0, frequency_bounds=(1e-5, 1e5)):
+        self.theta = [frequency]
+        self.bounds = [frequency_bounds]
+    def __call__(self, X1, X2=None):
+        if X2 is None:
+            # K(X1, X1) is symmetric so avoid redundant computation using pdist.
+            dists = pdist(X1, lambda xi, xj: np.dot(np.sin(self.theta[0] * np.pi * (xi - xj)).T, 
+                np.sin(self.theta[0] * np.pi * (xi - xj))))
+            K = np.exp(-dists)
+            K = squareform(K)
+            np.fill_diagonal(K, 1)
+        else:
+            dists = cdist(X1, X2, lambda xi, xj: np.dot(np.sin(self.theta[0] * np.pi * (xi - xj)).T, 
+                np.sin(self.theta[0] * np.pi * (xi - xj))))
+            K = np.exp(-dists)
+        return K
+
+
+Sampling from the GP prior
+가우시안 프로세스에서 함수를 샘플링하려면 먼저 샘플링된 함수를 평가할 입력 지점 \(n_*\)을 정해주고 해당하는 \(n_*\) 변량의 다변량 가우시안 분포에서 추출해야 한다.
+이는 아직 관찰된 데이터를 고려하지 않았기 때문에 커널 함수에 대한 사전 정보가 부족한 가우시안 프로세스 사전 분포에서의 추출을 뜻한다.
+
+\[\mathbf{f}_* \sim \mathcal{N}\left(\mathbf{0}, K(X_*, X_*)\right).\]
+
+또한 앞선 언급하였듯 가우시안 프로세스의 평균 함수 \(m(x)\)는 평균 함수로부터 얻을 수 있는 정보가 별로 없기에 단순한 설정을 위해 0으로 가정하였다. 그리고 \(X_*\)로부터 각 커널함수를 적용하여
+공분산 행렬 \(K(X_*, X_*)\)를 각각 구성한다. 각 커널 함수는 모두 symmetric positive semi-definite 공분산 행렬을 구성하므로 Cholesky decomposition를 통해 이를 분해할 수 있다.
+
+\[K(X_*, X_*)=LL^T\]
+
+다음으로 Cholesky decomposition의 분해 결과에서 가우시안 분포의 샘플 \(\mathbf{z} \sim \mathcal{N}(\mathbf{m}, K)\)를 생성하기 위해 아래의 공식을 활용한다.
+
+\[\mathbf{u} \sim \mathcal{N}(\mathbf{0}, I)\]
+
+\[\mathbf{z}=\mathbf{m} + L\mathbf{u}\]
+
+\[\mathbb{E}[\mathbf{z}] = \mathbf{m} + L\mathbb{E}[\mathbf{u}] = \mathbf{m}\]
+
+\[\text{cov}[\mathbf{z}] = L\mathbb{E}[\mathbf{u}\mathbf{u}^T]L^T = LL^T = K\]
+
+이를 코드를 통해 구현하면 아래와 같다.
+
+code3
+import numpy as np
+def sample_prior(self, X_test, n_samples=1, epsilon=1e-10):
+    y_mean = np.zeros(X_test.shape[0])
+    y_cov = self.kernel(X_test)
+    y_cov[np.diag_indices_from(y_cov)] += epsilon
+    L = np.linalg.cholesky(y_cov)
+    u = np.random.randn(y_mean.shape[0], n_samples)
+    z = np.dot(L, u) + y_mean[:, np.newaxis]
+    return z
+
+
+이제 앞서 정의한 세 개의 커널 함수는 각각 다른 가우시안 프로세스 사전분포를 가지므로 이에 따른 각 커널 함수별 가우시안 프로세스 사전분포에서 추출한 샘플들을 추출하면 아래와 같다.
+
+code4
+GPR.sample_prior = sample_prior
+
+X_test = np.arange(-5, 5, 0.005)[:, np.newaxis] 
+
+sigma_f_sq = 1 # Linear signal_variance
+l = 1  # Squared Exponential length_scale
+f = 0.5 # Periodic frequency
+
+gps = {'Linear': GPR(Linear(sigma_f_sq)), 
+       'SquaredExponential': GPR(SquaredExponential(l)),
+       'Periodic': GPR(Periodic(f))}
+
+for name, gp in gps.items():
+    y_samples = gp.sample_prior(X_test, n_samples=5, epsilon=1e-10)
+    plt.plot(X_test, y_samples)
+    plt.title('{} kernel'.format(name))
+    plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+그려진 plot은 각 커널 함수에 해당하는 가우시안 프로세스 사전분포 별로 5개의 함수를 가져온 뒤 이를 그린 결과물이다.
+의미있는 예측을 하려면 이렇게 사전 분포로부터 생성될 수 있는 함수 중 관측된 데이터와 일치하는 함수만을 포함하도록 제한해야 한다. 
+이 과정은 가우시안 프로세스 사후분포로부터 샘플링하는 과정을 통해 이루어 진다. 
+
+Sampling from the GP posterior
+먼저 가우시안 프로세스 사전분포 하에서 관측치 y는 다음과 같이 정의될 수 있다.
+
+\[\mathbf{y} \sim \mathcal{N}\left(\mathbf{0}, K(X, X) + \sigma_n^2I\right)\]
+
+추가된 항인 \(\sigma_n^2I\)는 제일 처음 언급한 내용대로 관측치의 가우시안 분포를 따르는 노이즈다. 노이즈는 각 관측치에 대해 독립이고 동일한 분포로부터 나온 값이므로 \(K(X, X)\)의 대각 요소에만 추가된다. 
+다음으로 다변량 가우시안 분포의 marginalisation property를 사용하여 가우시안 사전분포를 따르는 \(\mathbf{f_*}\)와 관측치 \(\mathbf{y}\)의 결합분포를 구하면 다음과 같다.
+
+\[\begin{bmatrix} \mathbf{y} \\ \mathbf{f}_* \end{bmatrix} = \mathcal{N}\left(\mathbf{0}, \begin{bmatrix} K(X, X)  + \sigma_n^2I &amp;amp;&amp;amp; K(X, X_*) \\ K(X_*, X) &amp;amp;&amp;amp; K(X_*, X_*)\end{bmatrix}\right)\]
+
+가우시안 프로세스의 사후 분포는 이 결합분포가 조건부로 주어졌을 때의 \(\mathbf{f}_*\)의 분포이고 다음과 같이 정의된다.
+
+\[\mathbf{f}_* | X_*, X, \mathbf{y} \sim \mathcal{N}\left(\bar{\mathbf{f}}_*, \text{cov}(\mathbf{f}_*)\right),\]
+
+\[\bar{\mathbf{f}}_* = K(X_*, X)\left[K(X, X) + \sigma_n^2\right]^{-1}\mathbf{y}\]
+
+\[\text{cov}(\mathbf{f}_*) = K(X_*, X_*) - K(X_*, X)\left[K(X, X) + \sigma_n^2\right]^{-1}K(X, X_*)\]
+
+앞서 사전 분포로부터 샘플링한 방식과 전체적으로 코드의 구성은 동일하지만 사전 분포의 평균과 공분산 대신 사후 분포의 평균과 공분산을 사용한다. 또한 주어진 데이터로부터 얻어지는 고정된 부분을 \(\mathbf{\alpha}\)와 
+\(\mathbf{v}\)로 정의하고 미리 계산해둠으로써 코드의 구성을 간결하게 했다.
+
+\[[K(X, X) + \sigma_n^2] = L L^T\]
+
+\[\mathbf{\alpha} = \left[K(X, X) + \sigma_n^2\right]^{-1}\mathbf{y} = L^T \backslash(L \backslash \mathbf{y})\]
+
+\[\mathbf{v} = L^T [K(X, X) + \sigma_n^2]^{-1}K(X, X_*) = L \backslash K(X, X_*)\]
+
+\[\bar{\mathbf{f}}_* = K(X, X_*)^T\mathbf{\alpha}\]
+
+\[\text{cov}(\mathbf{f}_*) = K(X_*, X_*) - \mathbf{v}^T\mathbf{v}\]
+
+code5
+def sample_posterior(self, X_train, y_train, X_test, n_samples=1):
+    
+    # compute alpha
+    K = self.kernel(X_train)
+    K[np.diag_indices_from(K)] += self.noise_var
+    L = np.linalg.cholesky(K)
+    alpha = np.linalg.solve(L.T, np.linalg.solve(L, y_train))
+    
+    # Compute posterior mean
+    K_trans = self.kernel(X_test, X_train)
+    y_mean = K_trans.dot(alpha)
+   
+    # Compute posterior covariance
+    v = np.linalg.solve(L, K_trans.T)  # L.T * K_inv * K_trans.T
+    y_cov = self.kernel(X_test) - np.dot(v.T, v)
+    
+    y_cov[np.diag_indices_from(y_cov)] += epsilon 
+    L = self._cholesky_factorise(y_cov)
+    u = np.random.randn(y_mean.shape[0], n_samples)
+    z = np.dot(L, u) + y_mean[:, np.newaxis]
+    return z, y_mean, y_cov
+
+
+관측치를 커널 함수가 Squared Exponential인 가우시안 프로세스 사전분포로부터 랜덤하게 10개를 샘플링한 후, 가우시안 프로세스 사후분포를 정의하여 샘플링하면 아래의 결과와 같다.
+
+code6
+GPR.sample_posterior = sample_posterior
+
+gp = gps['SquaredExponential']
+
+# 사전분포로부터 Data generation
+X_train = np.sort(np.random.uniform(-5, 5, 10))[:, np.newaxis] 
+y_train = gp.sample_prior(X_train) 
+y_train = y_train[:, 0]
+
+plt.plot(X_train[:, 0], y_train, 'r+')
+plt.title('Observations')
+plt.show()
+
+
+
+
+
+code7
+f_star_samples, f_star_mean, f_star_covar = gp.sample_posterior(X_train, y_train, X_test, n_samples=10)
+pointwise_variances = f_star_covar.diagonal()
+error = 1.96 * np.sqrt(pointwise_variances) # 95% confidence interval
+plt.plot(X_test, f_star_mean, 'b')
+plt.fill_between(X_test[:, 0], f_star_mean - error, f_star_mean + error, alpha=0.3)
+
+# Plot samples from posterior
+plt.plot(X_test, f_star_samples)
+
+# Also plot our observations for comparison
+plt.plot(X_train[:, 0], y_train, 'r+')
+
+plt.title('Posterior samples')
+plt.show()
+
+
+
+
+
+그려진 plot은 사후분포로부터 생성된 함수의 95% 신뢰구간을 나타낸다. 이 plot으로부터 기존의 관측치에서 새로운 데이터가 멀리 벗어날수록 예측은 사전 분포에 대한 영향을 잃고 함수 값의 분산이 증가하는 것을 알 수 있다. 
+또한 사후분포로부터 생성된 함수들은 모두 관측치를 지나는 것처럼 보이는데 이는 관측치에 대한 노이즈를 매우 작은 값(\(10^{-8}\))으로 설정했기 때문이다. 이 관측치에 대한 노이즈 값 부분은 코드 구성을 살펴보면 알 수 있듯이 직접 설정하여 바꿀 수도 있다.
+
+이렇게 관측치를 사전분포로부터 추출하면 당연히 사전분포를 형성하는 커널 함수가 데이터에 적합한 커널 함수가 될 수 밖에 없다. 
+그러나 실제 관측치는 이렇게 정의된 사전분포에 딱 떨어진 값이 아니다. 그래서 최적의 커널 함수를 찾는 것 역시 가우시안 프로세스의 중요한 과제이다.
+이는 이 포스트의 가장 앞 단락에서 설명한 함수 \(f(\phi(x))\)를 어떤 함수로 가져가야 주어진 데이터를 가장 잘 설명할 수 있을까에 대한 문제와 비슷하다. 
+하지만 가우시안 프로세스로부터 생성된 커널 함수의 집합은 기저함수의 집합보다 훨씬 광범위한 함수 분포를 포함하기 때문에 최적의 커널 함수를 찾지 못하는 것은 최적의 기저함수를 찾지 못하는 것보다 상대적으로 덜 위험한 결과를 보인다.
+
+다음으로 커널 함수를 잘 선정했더라도 커널 파라미터를 어떻게 결정해야 할지의 문제가 남아 있다. Squared Exponential 커널 함수에서도 커널 파라미터 \(l\)과 \(\sigma_f^2\)를 조절함에 따라 결과가 달리 나타난다.
+이는 베이즈 정리를 통하여 해결할 수 있다. 베이즈 정리에 의해 커널 파라미터 \(\theta\)에 대한 사후 분포는 다음과 같이 정의된다.
+
+\[p(\pmb{\theta}|\mathbf{y}, X) = \frac{p(\mathbf{y}|X, \pmb{\theta}) p(\pmb{\theta})}{p(\mathbf{y}|X)}.\]
+
+\(\theta\)에 대한 maximum a posteriori (MAP)는 해당 사후 분포 \(p(\pmb{\theta}|\mathbf{y}, X)\)가 가장 클 때 발생한다. 일반적으로 커널 파라미터는 사전 정보가 거의 없기 때문에 커널 파라미터에 대한 사전분포는 uniform 분포를 가정한다.
+이 경우 \(\theta_{MAP}\)는 Marginal Likelihood를 최대화하여 구할 수 있다. 실제로 연산을 할 때는 편의를 위해 Log Marginal Likelihood를 최대화하는 \(\theta\)가 \(\theta_{MAP}\)이다.
+
+\[p(\mathbf{y}|X, \pmb{\theta}) = \mathcal{N}(\mathbf{0}, K(X, X) + \sigma_n^2I)\]
+
+\[\text{log}p(\mathbf{y}|X, \pmb{\theta}) = -\frac{1}{2}\mathbf{y}^T\left[K(X, X) + \sigma_n^2I\right]^{-1}\mathbf{y} - \frac{1}{2}\text{log}\lvert K(X, X) + \sigma_n^2I \lvert - \frac{n}{2}\text{log}2\pi\]
+
+앞선 사후 분포 파트의 코드 구성에서 Log Marginal Likelihood 구성 식 중 데이터로부터 얻어지는 고정 값 \(\mathbf{\alpha}\) 부분은 미리 계산해두었다. (\(\mathbf{\alpha} = \left[K(X, X) + \sigma_n^2\right]^{-1}\mathbf{y} = L^T \backslash(L \backslash \mathbf{y})\))
+남은 부분은 Cholesky decomposition을 통해 \([K(X, X) + \sigma_n^2] = L L^T\)로 분해하여 아래와 같이 전개함으로써 계산을 편리하게 바꾼다.
+
+\[\lvert K(X, X) + \sigma_n^2 \lvert = \lvert L L^T \lvert = \prod_{i=1}^n L_{ii}^2 \quad \text{or} \quad \text{log}\lvert{K(X, X) + \sigma_n^2}\lvert = 2 \sum_i^n \text{log}L_{ii}\]
+
+이를 코드를 통해 구성하면 다음과 같다. 코드 구성 상 편의를 위해 log marginal likelihood에 -1을 곱하여 이를 최소화시키는 파라미터를 찾도록 수정하였다.
+
+code8
+def log_marginal_likelihood(self, X_train, y_train, theta, noise_var=None):
+    
+    if noise_var is None:
+        noise_var = self.noise_var
+    
+    # Build K(X, X)
+    self.kernel.theta = theta
+    K = self.kernel(X_train)    
+    K[np.diag_indices_from(K)] += noise_var
+       
+    # Compute L and alpha for this K (theta).
+    L = self._cholesky_factorise(K)
+    alpha = np.linalg.solve(L.T, np.linalg.solve(L, y_train))
+        
+    # Compute log marginal likelihood.
+    log_likelihood = -0.5 * np.dot(y_train.T, alpha)
+    log_likelihood -= np.log(np.diag(L)).sum()
+    log_likelihood -= K.shape[0] / 2 * np.log(2 * np.pi)
+    
+    return log_likelihood
+
+def optimize(self, X_train, y_train):
+    
+    def obj_func(theta, X_train, y_train):
+            return -self.log_marginal_likelihood(X_train, y_train, theta)
+  
+    results = minimize(obj_func, 
+                       self.kernel.theta, 
+                       args=(X_train, y_train), 
+                       method=self.optimizer, 
+                       jac=None,
+                       bounds=self.kernel.bounds)
+
+    # Store results of optimization.
+    self.max_log_marginal_likelihood_value = -results['fun']
+    self.kernel.theta_MAP = results['x']
+    
+    return results['success']
+
+success = gp.optimize(X_train, y_train)
+
+이제 Squared Exponential 커널 함수의 커널 파라미터 \(\pmb{\theta}=\{l\}\)에 대한 \(\pmb{\theta}_{MAP}\)를 계산하면 \(\pmb{\theta}_{MAP}\)는 1.31723513이고 Maximised log marginal liklehihood는 1.32706104로 나타난다.
+물론 이 값이 전역 최적해라 할 수는 없다. 하지만 \(\pmb{\theta}_{MAP}\)는 일반적으로 좋은 추정치이며 데이터를 생성하는데 사용되는 \(\pmb{\theta}\)에 매우 가까운 값이라는 것을 알 수 있다. 
+또한 위의 코드에서는 보다 간단한 예시를 위해 \(l\)에 대해서만 추정을 진행하기 위해 관측치의 노이즈에 대한 값을 고정 값(\(10^{-8}\))으로 두었지만 커널 파라미터 \(\sigma_n^2\)에 대해서도 동일한 과정을 적용하면 \(\sigma_n^2\)의 추정치를 구할 수 있다.
+
+결론
+이번 논문 구현 과제를 통해 가우시안 프로세스를 회귀 문제에 적용하는 과정을 설명했다. 하지만 이는 가우시안 프로세스에 대한 단적인 부분에 불과하다. 
+가우시안 프로세스는 현재 연구가 깊게 이루어진 분야로 오늘 소개한 내용은 기초에 불과하고 이러한 회귀 문제에 적용하는 과정뿐 아니라 분류 문제에 적용하는 과정, 딥러닝 모델에 결합하는 방법론 등 더욱 다양한 부분이 남아 있다.
+아직 가우시안 프로세스에 대한 이해가 부족하기에 회귀 문제에 적용하는 과정에 대해서도 모든 내용을 잘 담지는 못 하였으나, 추후 공부를 통해 보다 깊이 있는 내용을 추가적으로 더 다뤄보고 싶다.
+
+
+  참고문헌
+  
+    Williams, C. K., &amp;amp; Rasmussen, C. E. (1996). Gaussian processes for regression. In Advances in neural information processing systems (pp. 514-520).
+    Ebden, M. (2015). Gaussian processes: A quick introduction. arXiv preprint arXiv:1505.02965.
+  
+
+
+</content>
+      <categories>
+        
+          <category> paper </category>
+        
+          <category> kernel method </category>
+        
+      </categories>
+      <tags>
+        
+          <tag> gaussian process </tag>
+        
+      </tags>
+      <tags></tags>
+    </entry>
+  
+    <entry>
+      <title>Towards open set deep networks</title>
+      <url>/paper/openset/2020/10/11/openmax-paper/</url>
+      <content type="text">논문 선정 이유
+강필성 교수님의 비즈니스 어낼리틱스 수업의 첫번째 논문 구현 주제는 차원 축소다. 차원 축소와 관련하여 아래의 논문을 선정하였다.
+
+
+
+
+
+
+  Bendale, A., &amp;amp; Boult, T. E. (2016). Towards open set deep networks. In Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 1563-1572).
+
+
+위 논문은 축소된 차원에서 각 클래스별 중심 벡터를 계산한 후, 클래스별 중심 벡터와 떨어진 거리를 활용하여 학습데이터에 없는 클래스의 데이터를 거부하는 방법론을 다룬다.
+기존에 연구 중이던 주제이기도 하였기에 이를 직접 구현해보기로 했다.
+
+논문의 특징
+
+  1) Open Set Recognition
+기존의 딥러닝 기반 Classifier는 학습 단계에서 모든 예측 가능한 클래스가 학습된다는 닫힌 세계 가정을 따른다. 
+이로 인해 학습 데이터에 없는 클래스의 데이터에 대해 예측할 때에도 높은 확률로 학습된 클래스 중 하나로 분류하게 된다. 
+하지만 실제 세계에서는 수집되지 않은 클래스의 데이터가 대다수이며 단기간에 모든 가능한 클래스의 데이터를 학습시킨다는 것은 불가능에 가깝다. 
+따라서 학습되지 않은 클래스의 알람에 대하여 학습된 클래스의 알람으로 오분류 하지 않고,
+모르는 클래스로 감지할 수 있는 알고리즘을 Open Set Recognition이라고 한다. (Scheirer et al., 2012).
+2) 축소된 차원(Feature Space)에서 Open Set Risk 측정
+해당 논문의 Open Set Recognition 알고리즘은 모델의 학습이 완료된 후에 후처리로 SoftMax 확률값을 새롭게 정의하여(OpenMax) 모르는 클래스의 데이터일
+확률값을 도출한다. 이때 모르는 클래스의 데이터일 확률은 네트워크의 마지막에서 두번째 레이어의 Feature Space에서 계산된 Activation Vector를 활용한다.
+
+
+
+구현 대상 논문의 방법론 요약
+
+학습 직후 후처리 : Extreme Value theorem 기반 클래스별 Outlier Distribution을 도출
+
+
+
+논문에서는 모델의 학습이 완료된 후 Softmax layer에 입력되기 전 마지막에서 두번째 레이어의 Feature Space의 Activation Vector를 활용하여 각 클래스별 Outlier Distribution을 도출한다.
+알고리즘을 순차적으로 따라가면 먼저 학습데이터를 이용하여 Classifier를 학습하고, 학습된 Classifier가 정분류한 학습 데이터만을 추출한 뒤,
+각 클래스별로 분리한다. 다음으로 각 클래스별로 Classifier의 마지막에서 두번째 레이어의 Feature Space의 Activation Vector를 수집한 뒤
+클래스별 평균 Activation Vector를 계산한 후, 각 정분류 관측치의 Activation Vector가 해당 클래스의 평균 Activation Vector와 떨어진 거리를 계산한다. 
+이를 오름차 순으로 정렬하여 각 클래스별 평균 Activation Vector와 떨어진 거리가 먼 순서대로 \(\eta\)개의 거리를 샘플로 사용하여 각 클래스별 극단분포를 도출한다. 
+논문에서는 \(\eta\)개의 먼 거리 샘플로 Weibull distribution에 피팅하여 이를 극단분포로 활용한다. 이렇게 극단치의 샘플들을 이용하여 극단분포를 피팅하는 이론적 배경은 Extreme Value Theorem에 있다.
+
+
+
+
+
+테스트 단계 : Unknown Class에 대한 SoftMax 확률값 정의 - OpenMax
+
+
+
+
+다음으로는 앞 단계의 각 클래스별 극단분포와 평균 Activation Vector를 이용하여 Open Set Recognition 알고리즘을 수행하는 핵심파트이다. 해당 파트에서는 새로운 테스트 데이터가 입력되었을 때
+각 클래스별로 테스트 데이터의 Activation Vector와 해당 클래스의 평균 Activation Vector가 떨어진 거리를 계산하고 계산된 거리로 해당 클래스 극단분포의 CDF(cumulative distribution function)에 입력하여
+새로운 테스트 데이터가 각 클래스별 극단분포를 어디쯤 위치하는지를 계산한다. CDF의 값이 낮을수록 각 클래스별 평균 Activation Vector와 떨어진 거리가 멀기 때문에 Activation Vector의 각 원소값(각 클래스에 매칭되는)을
+CDF 결과값과 곱하여 갱신해주게 되면 해당 클래스에 속하지 않는 데이터의 경우 Activation Vector의 해당 클래스 원소값이 작아지게 되어 SoftMax 확률값 또한 줄어들게 된다. 다음으로 각 클래스별 Activation Vector의 원소값이 줄어든 부분을
+모두 모아 새로운 Unknown class의 Activation Vector 원소값을 정의한다. 이로 인해 Unknown Class에 대한 Softmax 확률값을 계산할 수 있고 모델은 수정된 SoftMax(OpenMax)를 통해 새로운 테스트 데이터에 대한 예측 레이블을 결정한다.
+또한, Unknown Class Detection 성능을 보완하기 위해 threshold 값을 정하여 학습 데이터의 모든 클래스의 Softmax 확률값이 모두 threshold보다 작을 경우에도 Unknown Class로 예측하게 구성한다.
+
+코드 구현
+Classifier 구축
+논문의 내용을 구현하기 위해 우선 논문과 동일하게 Image Classification Task를 수행하는 모델을 준비했다.
+논문에서는 pre-trained AlexNet을 Base Model로 사용하였지만 해당 논문은 모델 학습 후 후처리로 적용되는 알고리즘이기 때문에 어떠한 Classifier를 사용해도 무방했다.
+따라서 이번 과제에서는 3-Dense Block의 DenseNet과 Smaller VGGNet, ResNet을 각각 구현하여 알고리즘의 Base Model로 사용했다.
+import tensorflow as tf
+from tensorflow.keras.layers import Input
+from tensorflow.keras.layers import Concatenate
+from tensorflow.keras.layers import ReLU
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Flatten
+from tensorflow.keras.layers import Conv2D
+from tensorflow.keras.layers import ZeroPadding2D
+from tensorflow.keras.layers import Activation
+from tensorflow.keras.layers import Add
+from tensorflow.keras.layers import MaxPooling2D
+from tensorflow.keras.layers import AveragePooling2D
+from tensorflow.keras.layers import GlobalAveragePooling2D
+from tensorflow.keras.layers import Dropout
+from tensorflow.keras.layers import BatchNormalization
+
+# DenseNet
+def ConvBlock(x, filters):
+    x = BatchNormalization()(x)
+    x = ReLU()(x)
+    x = Conv2D(filters=filters * 4, use_bias=False,
+               kernel_size=(1, 1), strides=(1, 1),
+               padding='same')(x)
+    x = BatchNormalization(axis=-1)(x)
+    x = ReLU()(x)
+    x = Conv2D(filters=filters, use_bias=False,
+               kernel_size=(3, 3), strides=(1, 1),
+               padding='same')(x)
+    return x
+
+def TransitionBlock(x, filters, compression=1):
+    x = BatchNormalization(axis=-1)(x)
+    x = ReLU()(x)
+    x = Conv2D(filters=int(filters * compression), use_bias=False,
+               kernel_size=(1, 1), strides=(1, 1),
+               padding='same')(x)
+    x = AveragePooling2D(pool_size=(2, 2), strides=(2, 2))(x)
+    return x
+
+def DenseBlock(x, layers, growth_rate):
+    concat_feature = x
+    for l in range(layers):
+        x = ConvBlock(concat_feature, growth_rate)
+        concat_feature = Concatenate(axis=-1)([concat_feature, x])
+    return concat_feature
+
+def densenet_model(x_shape, y_shape, use_bias=False, print_summary=False):
+    _in = Input(shape=x_shape)
+    x = Conv2D(filters=24, kernel_size=(3, 3), strides=(1, 1),
+               padding='same', use_bias=False)(_in)
+    x = DenseBlock(x, 16, 12)
+    x = TransitionBlock(x, x.shape[-1], 0.5)
+    x = DenseBlock(x, 16, 12)
+    x = TransitionBlock(x, x.shape[-1], 0.5)
+    x = DenseBlock(x, 16, 12)
+    x = GlobalAveragePooling2D()(x)
+    _out = Dense(units=y_shape, use_bias=False, activation=None)(x)
+    model = tf.keras.models.Model(inputs=_in, outputs=_out, name='DenseNet')
+    if print_summary:
+        model.summary()
+    return model
+
+# Smaller VGGNet
+def vggnet_model(x_shape, y_shape, use_bias=False, print_summary=False):
+    _in = Input(shape=x_shape)
+    # CONV =&amp;gt; RELU =&amp;gt; POOL
+    x = Conv2D(filters=32, kernel_size=(3, 3), strides=(1, 1),
+               padding='same', use_bias=False)(_in)
+    x = ReLU()(x)
+    x = BatchNormalization(axis=-1)(x)
+    x = MaxPooling2D(pool_size=(3, 3))(x)
+    x = Dropout(0.25)(x)
+    # (CONV =&amp;gt; RELU) * 2 =&amp;gt; POOL
+    x = Conv2D(filters=64, kernel_size=(3, 3), strides=(1, 1),
+               padding='same', use_bias=False)(x)
+    x = ReLU()(x)
+    x = BatchNormalization(axis=-1)(x)
+    x = Conv2D(filters=64, kernel_size=(3, 3), strides=(1, 1),
+               padding='same', use_bias=False)(x)
+    x = ReLU()(x)
+    x = BatchNormalization(axis=-1)(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+    x = Dropout(0.25)(x)
+    # (CONV =&amp;gt; RELU) * 2 =&amp;gt; POOL
+    x = Conv2D(filters=128, kernel_size=(3, 3), strides=(1, 1),
+               padding='same', use_bias=False)(x)
+    x = ReLU()(x)
+    x = BatchNormalization(axis=-1)(x)
+    x = Conv2D(filters=128, kernel_size=(3, 3), strides=(1, 1),
+               padding='same', use_bias=False)(x)
+    x = ReLU()(x)
+    x = BatchNormalization(axis=-1)(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+    x = Dropout(0.25)(x)
+    # FC =&amp;gt; RELU
+    x = Flatten()(x)
+    x = Dense(1024)(x)
+    x = ReLU()(x)
+    x = BatchNormalization(axis=-1)(x)
+    x = Dropout(0.5)(x)
+    _out = Dense(units=y_shape, use_bias=False, activation=None)(x)
+    model = tf.keras.models.Model(inputs=_in, outputs=_out, name=&quot;SmallerVGGNet&quot;)
+    if print_summary:
+        model.summary()
+    return model
+
+# ResNet
+def ConvBlock1(x):
+    x = Conv2D(filters=32, kernel_size=(3, 3), strides=(1, 1), padding='same')(x)
+    x = BatchNormalization()(x)
+    x = Activation('relu')(x)
+    return x
+
+def ConvBlock2(x, num_blocks, filter_1, filter_2, first_strides):
+    shortcut = x
+    for i in range(num_blocks):
+        if (i == 0):
+            x = Conv2D(filter_1, (1, 1), strides=first_strides, padding='valid')(x)
+            x = BatchNormalization()(x)
+            x = Activation('relu')(x)
+            x = Conv2D(filter_1, (3, 3), strides=(1, 1), padding='same')(x)
+            x = BatchNormalization()(x)
+            x = Activation('relu')(x)
+            x = Conv2D(filter_2, (1, 1), strides=(1, 1), padding='valid')(x)
+            shortcut = Conv2D(filter_2, (1, 1), strides=first_strides, padding='valid')(shortcut)
+            x = BatchNormalization()(x)
+            shortcut = BatchNormalization()(shortcut)
+            x = Add()([x, shortcut])
+            x = Activation('relu')(x)
+            shortcut = x
+        else:
+            x = Conv2D(filter_1, (1, 1), strides=(1, 1), padding='valid')(x)
+            x = BatchNormalization()(x)
+            x = Activation('relu')(x)
+            x = Conv2D(filter_1, (3, 3), strides=(1, 1), padding='same')(x)
+            x = BatchNormalization()(x)
+            x = Activation('relu')(x)
+            x = Conv2D(filter_2, (1, 1), strides=(1, 1), padding='valid')(x)
+            x = BatchNormalization()(x)
+            x = Add()([x, shortcut])
+            x = Activation('relu')(x)
+            shortcut = x
+    return x
+
+def resnet_model(x_shape, y_shape, use_bias=False, print_summary=True):
+    _in = Input(shape=x_shape)
+    x = ConvBlock1(_in)
+    x = MaxPooling2D(pool_size=(3, 3), strides=2)(x)
+    x = ConvBlock2(x, num_blocks = 3, filter_1 = 32, filter_2 = 128, first_strides = (1, 1))
+    x = ConvBlock2(x, num_blocks = 4, filter_1 = 64, filter_2 = 256, first_strides = (2, 2))
+    x = ConvBlock2(x, num_blocks = 6, filter_1 = 128, filter_2 = 512, first_strides = (2, 2))
+    x = ConvBlock2(x, num_blocks = 3, filter_1 = 256, filter_2 = 1024, first_strides = (2, 2))
+    x = GlobalAveragePooling2D()(x)
+    _out = Dense(units=y_shape, use_bias=False, activation=None)(x)
+    model = tf.keras.models.Model(inputs=_in, outputs=_out, name='ResNet50')
+    if print_summary:
+        model.summary()
+    return model
+
+데이터 불러오기 및 전처리
+
+다음으로 실험 및 평가를 위해 사용할 데이터로 CIFAR-10 데이터를 활용했다. 다음 코드는 CIFAR-10 데이터를 불러와서 CNN Classifier에 입력될 수 있도록 전처리를 진행하는 코드이다.
+
+import numpy as np
+from tensorflow.keras.datasets.cifar10 import load_data
+from sklearn.preprocessing import OneHotEncoder
+
+def adjust_images(raw_images):
+    adj_images = tf.image.per_image_standardization(raw_images).numpy()
+    adj_images = np.array([(x-x.min())/(x.max()-x.min()) for x in adj_images], dtype=np.float32)
+
+    return adj_images
+
+total_classes = list(range(10))
+target_classes = total_classes
+m = len(target_classes)
+
+(train_images, train_y), (test_images, test_y) = load_data()
+train_x, test_x = train_images.astype(np.float32) / 255, test_images.astype(np.float32) / 255
+train_x, test_x = adjust_images(train_x), adjust_images(test_x)
+train_y, test_y = train_y.flatten(), test_y.flatten()
+
+enc = OneHotEncoder(sparse=False, categories='auto')
+train_y_enc = enc.fit_transform(train_y.reshape(-1, 1)).astype(np.float32)
+
+train_data = tf.data.Dataset.from_tensor_slices(
+    (train_x, train_y_enc)).shuffle(BUFFER_SIZE, SEED, True).batch(BATCH_SIZE)
+
+Classifier 모델 학습
+이후 학습데이터를 통해 모델의 학습을 진행한다. 모델의 Optimizer는 Adam Optimizer를 사용하였고 Learning Rate은 0.01로 시작하여 50epoch 이후 0.001, 100epoch 이후 0.0001로 설정하여 점점 줄어들게 하였다. 이후
+총 150epoch의 학습을 진행하여 학습을 완료시켰다.
+
+from tensorflow.keras.callbacks import EarlyStopping
+from time import time
+from tqdm import tqdm
+
+def network_train_step(x, y):
+    with tf.GradientTape() as network_tape:
+        y_pred = CNN(x, training=True)
+
+        network_loss = tf.keras.losses.categorical_crossentropy(y, y_pred)
+        network_acc = tf.keras.metrics.categorical_accuracy(y, y_pred)
+
+    network_grad = network_tape.gradient(network_loss, CNN.trainable_variables)
+    network_opt.apply_gradients(zip(network_grad, CNN.trainable_variables))
+
+    return tf.reduce_mean(network_loss), tf.reduce_mean(network_acc)
+
+def train(dataset, epochs):
+    pbar = tqdm(range(epochs))
+    for epoch in pbar:
+        if epoch == 50:
+            network_opt.__setattr__('learning_rate', 1E-3)
+        elif epoch == 100:
+            network_opt.__setattr__('learning_rate', 1E-4)
+            
+        avg_loss = []
+        for batch in dataset:
+            losses = network_train_step(batch[0], batch[1])
+            avg_loss.append(losses)
+
+        pbar.set_description('Categorical CE Loss: {:.4f} | Accuracy: {:.4f} '.format(
+            *np.array(losses)))
+
+# CNN model
+if model_name == 'DenseNet':
+    CNN = densenet_model(train_x.shape[1:], train_y_enc.shape[1], False, False)
+elif model_name == 'resnet':
+    CNN = resnet_model(train_x.shape[1:], train_y_enc.shape[1], False, False)
+elif model_name == 'SmallerVGGNet':
+    CNN = vggnet_model(train_x.shape[1:], train_y_enc.shape[1], False, False)
+else :
+    print('Model is not defined')
+train(train_data, 150)
+
+OpenMax 구축
+다음으로 libmr 패키지를 이용하여 Weibull Distribution fitting을 하였고 앞서 요약한 논문의 방법론 중 테스트 단계에 해당하는 OpenMax 알고리즘를 순서에 따라 구현하였다.
+def get_model_outputs(dataset, prob=False):
+    pred_scores = []
+    for x in dataset:
+        model_outputs = CNN(x, training=False)
+        if prob:
+            model_outputs = tf.nn.softmax(model_outputs)
+        pred_scores.append(model_outputs.numpy())
+    pred_scores = np.concatenate(pred_scores, axis=0)
+    return pred_scores
+
+train_data = tf.data.Dataset.from_tensor_slices(train_x).batch(TEST_BATCH_SIZE)
+train_pred_scores = get_model_outputs(train_data, False)
+train_pred_simple = np.argmax(train_pred_scores, axis=1)
+print(accuracy_score(train_y, train_pred_simple))
+
+train_correct_actvec = train_pred_scores[np.where(train_y == train_pred_simple)[0]]
+train_correct_labels = train_y[np.where(train_y == train_pred_simple)[0]]
+
+dist_to_means = []
+mr_models, class_means = [], []
+for c in np.unique(train_y):
+    class_act_vec = train_correct_actvec[np.where(train_correct_labels == c)[0], :]
+    class_mean = class_act_vec.mean(axis=0)
+    dist_to_mean = np.square(class_act_vec - class_mean).sum(axis=1)
+    dist_to_mean = np.sort(dist_to_mean).astype(np.float64)
+    dist_to_means.append(dist_to_mean)
+    mr = libmr.MR()
+    mr.fit_high(dist_to_mean[-eta:], eta)
+    class_means.append(class_mean)
+    mr_models.append(mr)
+
+class_means = np.array(class_means)
+
+def compute_openmax(actvec):
+    dist_to_mean = np.square(actvec - class_means).sum(axis=1).astype(np.float64)
+    scores = []
+    for dist, mr in zip(dist_to_mean, mr_models):
+        scores.append(mr.w_score(dist))
+    scores = np.array(scores)
+    w = 1 - scores
+    rev_actvec = np.concatenate([
+        w * actvec,
+        [((1 - w) * actvec).sum()]])
+    return np.exp(rev_actvec) / np.exp(rev_actvec).sum()
+
+def make_prediction(_scores, _T, thresholding=True):
+    _scores = np.array([compute_openmax(x) for x in _scores])
+    if thresholding:
+        uncertain_idx = np.where(np.max(_scores, axis=1) &amp;lt; _T)[0]
+        uncertain_vec = np.zeros((len(uncertain_idx), m + 1))
+        uncertain_vec[:, -1] = 1
+        _scores[uncertain_idx] = uncertain_vec
+    _labels = np.argmax(_scores, 1)
+    return _labels
+
+
+
+알고리즘 성능 평가
+끝으로 학습된 클래스의 데이터와 학습되지 않은 클래스의 데이터를 통해 성능을 평가한다. MNIST 데이터와 Random Noise 데이터를 Unknown Test Data로 활용하였고 
+이를 통해 학습된 클래스의 Test Data의 f1_score와 accuracy, 학습되지 않은 Unknown Test Data에 대한 f1_score와 accuracy를 각각 도출하여 해당 알고리즘의 성능을 평가하였다.
+thresholding = True
+
+test_data = tf.data.Dataset.from_tensor_slices(test_x).batch(TEST_BATCH_SIZE)
+test_pred_scores = get_model_outputs(test_data)
+test_pred_labels = make_prediction(test_pred_scores, threshold, thresholding)
+
+## testing on MNIST (Unseen Classes)
+data_train, data_test = tf.keras.datasets.mnist.load_data()
+(images_train, labels_train) = data_train
+(images_test, labels_test) = data_test
+mnist_test = adjust_images(np.array(images_test))
+test_batcher = tf.data.Dataset.from_tensor_slices(mnist_test).batch(TEST_BATCH_SIZE)
+test_scores = get_class_prob(test_batcher)
+test_mnist_labels = make_prediction(test_scores, threshold, thresholding)
+
+## testing on random noise (Unseen Classes)
+
+images = np.random.uniform(0, 1, (10000, 32, 32, 3)).astype(np.float32)
+test_batcher = tf.data.Dataset.from_tensor_slices(images).batch(TEST_BATCH_SIZE)
+test_scores = get_class_prob(test_batcher)
+test_noise_labels = make_prediction(test_scores, threshold, thresholding)
+
+test_unseen_labels = np.concatenate([
+        test_mnist_labels,
+        test_noise_labels])
+    
+test_pred = np.concatenate([test_pred_labels, test_unseen_labels])
+test_true = np.concatenate([test_y.flatten(),
+                            np.ones_like(test_unseen_labels)*m])
+    
+test_macro_f1 = f1_score(test_true, test_pred, average='macro')
+#print(f1_score(test_true, test_pred, average=None))
+
+test_seen_acc = accuracy_score(test_y, test_pred_labels)
+
+test_unseen_f1 = np.array([f1_score(np.ones_like(test_unseen_labels), test_unseen_labels == m),
+                           f1_score(np.ones_like(test_mnist_labels), test_mnist_labels == m),
+                           f1_score(np.ones_like(test_noise_labels), test_noise_labels == m)])
+ 
+print('overall f1: {:.4f}'.format(test_macro_f1))
+print('seen acc: {:.4f}'.format(test_seen_acc))
+print('unseen f1: {:.4f} / {:.4f} / {:.4f} / {:.4f} / {:.4f}'.format(*test_unseen_f1))
+
+
+결과
+총 3개의 CNN Classifier 중 ResNet 모델을 load하여 SoftMax만 적용한 모델의 성능과 OpenMax를 적용한 모델을 비교함으로써 논문의 알고리즘의 성능을 검증하였다.
+총 30,000 개의 테스트 데이터 중 학습된 클래스 10,000개의 테스트 데이터에 대해서는 SoftMax가 Accuracy 기준 82.7%, OpenMax가 81.3%의 성능을 보였다.
+학습된 클래스의 데이터에 대해서는 OpenMax 알고리즘이 Unknown Class에 대한 SoftMax 확률값을 만들어 주면서 기존의 학습된 클래스의 Activation Vector 원소값을 덜어내기 때문에
+학습된 클래스로 분류될 확률이 줄어든다. 따라서 학습된 클래스에 대해서는 OpenMax가 SoftMax 대비 다소 낮은 성능을 보이게 된다.
+하지만 학습되지 않은 클래스의 테스트 데이터 20,000개에서는 SoftMax가 Accuracy 기준 7.87%, OpenMax가 31.3%로 큰 성능 차이를 보였다. 
+(SoftMax의 경우, 모든 클래스의 SoftMax 확률값이 threshold 0.9보다 작으면 Unknown Class로 분류되게끔 구성) 이를 통해 OpenMax 알고리즘이 Open Set Recognition 성능면에서 효과가 있음을 확인할 수 있다.
+
+
+  참고문헌
+  
+    Bendale, A., &amp;amp; Boult, T. E. (2016). Towards open set deep networks. In Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 1563-1572).
+    Scheirer, W. J., Rocha, A., Micheals, R. J., &amp;amp; Boult, T. E. (2011). Meta-recognition: The theory and practice of recognition score analysis. IEEE transactions on pattern analysis and machine intelligence, 33(8), 1689-1695.** 
+  
+
+</content>
+      <categories>
+        
+          <category> paper </category>
+        
+          <category> openset </category>
+        
+      </categories>
+      <tags>
+        
+          <tag> Open Set Recognition </tag>
+        
+      </tags>
+      <tags></tags>
+    </entry>
+  
+</search>
